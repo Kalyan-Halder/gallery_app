@@ -1,0 +1,19 @@
+const express = require("express")
+const router = express.Router()
+
+
+//Calling for database connection
+require("../utils/connection");
+//very important line or else the json will not work
+router.use(express.json())
+router.route("/").get((req,res)=>{
+    res.status(200).send("This is the Home Page")
+})
+
+router.use(require("./registration"))
+router.use(require("./signin"))
+router.use(require("./update"))
+router.use(require("./create_post"))
+
+
+module.exports  = router;
