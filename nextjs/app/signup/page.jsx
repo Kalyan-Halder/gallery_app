@@ -1,6 +1,7 @@
 "use client"
 import { useState } from "react";
 import Link from 'next/link';
+import { useRouter } from "next/navigation";
 
 const Signup = () => {
  
@@ -16,6 +17,7 @@ const Signup = () => {
   })
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const router = useRouter()
 
   const handleChange = (e)=>{
      setFormdata({
@@ -59,6 +61,10 @@ const Signup = () => {
         username:"",
         email:""
       })
+    }else if(response.status == 200){
+      setTimeout(() => {
+      router.push("/");
+      },500);
     }
     }catch(err){
       setError(err.message || "An error occurred during registration")

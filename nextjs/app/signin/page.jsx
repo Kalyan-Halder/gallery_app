@@ -42,7 +42,6 @@ const Signin = () => {
 
       const data = await response.json();
       if(response.status == 400){
-        console.log(data.message)
         setFormData({
           email:"",
           username:"",
@@ -50,18 +49,16 @@ const Signin = () => {
         })
         setError(data.message)
       }
-      else if(response.status == 400){
+      else if (response.status == 200){
+        console.log("Its a success")
         localStorage.setItem('token', data.token)
         window.dispatchEvent(new Event('tokenChange'));
         setTimeout(() => {
         router.push("/");
-        }, 100);
+        },500);
       }
-    
-      console.log("Signin success:", data);
-      // TODO: redirect user or store token
     } catch (err) {
-      setError(err.message);
+       
     } finally {
       setLoading(false);
     }

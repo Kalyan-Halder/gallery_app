@@ -16,15 +16,20 @@ const schema = new mongoose.Schema({
         type:Date,
         default: Date.now()
     },
-    token:String
+    token:String,
+    authetication:{
+        type:Boolean,
+        default:false
+    },
+    otp:Number
 });
 
 schema.pre('save', async function() {
     if(this.isModified('password')){
         this.password = await bcrypt.hash(this.password, saltRounds);
-        this.confpassword = await bcrypt.hash(this.confpassword, saltRounds);
+        this.confpassword = await bcrypt.hash(this.conpassword, saltRounds);
     }
-});
+}); 
 
 const user = new mongoose.model("user",schema);
 

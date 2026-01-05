@@ -27,6 +27,7 @@ router.route("/signin").post( async(req,res)=>{
 
                 const update_token = await user.findByIdAndUpdate({_id:user_exist._id},{token:user_token})
                 await update_token.save()
+                console.log("I am success")
                 res.status(200).json({token : user_token})
              }else{
                 res.status(400).json({message:"Incorrect Username/Email/Password"})
