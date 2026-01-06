@@ -56,6 +56,11 @@ const Signin = () => {
         setTimeout(() => {
         router.push("/");
         },500);
+      }else if (response.status == 401){
+        setError("User is Not Verified. Needs Verification")
+        setTimeout(() => {
+        router.push("/verify");
+        },1500);
       }
     } catch (err) {
        
@@ -111,7 +116,9 @@ const Signin = () => {
 
           {/* Forgot password */}
           <div className="text-sm text-blue-600 font-medium hover:underline cursor-pointer">
-            Forgot password?
+            <Link href="/reset">
+                 Forgot password?
+            </Link>
           </div>
 
           {/* Button */}

@@ -63,7 +63,7 @@ const Signup = () => {
       })
     }else if(response.status == 200){
       setTimeout(() => {
-      router.push("/");
+      router.push("/verify");
       },500);
     }
     }catch(err){

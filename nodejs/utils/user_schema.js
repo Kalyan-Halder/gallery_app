@@ -17,7 +17,7 @@ const schema = new mongoose.Schema({
         default: Date.now()
     },
     token:String,
-    authetication:{
+    authentication:{
         type:Boolean,
         default:false
     },
@@ -27,7 +27,7 @@ const schema = new mongoose.Schema({
 schema.pre('save', async function() {
     if(this.isModified('password')){
         this.password = await bcrypt.hash(this.password, saltRounds);
-        this.confpassword = await bcrypt.hash(this.conpassword, saltRounds);
+        this.conpassword = await bcrypt.hash(this.conpassword, saltRounds);
     }
 }); 
 

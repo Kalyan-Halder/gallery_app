@@ -14,6 +14,8 @@ router.use(require("./registration"))
 router.use(require("./signin"))
 router.use(require("./update"))
 router.use(require("./create_post"))
+router.use(require("./verify"))
+router.use(require("./reset"))
 
 
 module.exports  = router;
