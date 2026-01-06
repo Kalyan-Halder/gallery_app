@@ -7,13 +7,16 @@ const Signup = () => {
  
   const [formData, setFormdata] = useState({
      first_name : "",
-     lastname : "",
+     last_name : "",
      username:"",
      email:"",
      phone:"",
      password:"",
      conpassword:"",
-     date_of_birth:""
+     date_of_birth:"",
+     bio:"",
+     address:"",
+     weblink:""
   })
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -38,7 +41,7 @@ const Signup = () => {
         conpassword:""
       })
       return
-    }else if(!formData.first_name || !formData.lastname || !formData.username || !formData.email || !formData.phone || !formData.password || !formData.conpassword || !formData.date_of_birth){
+    }else if(!formData.first_name || !formData.last_name || !formData.username || !formData.email || !formData.phone || !formData.password || !formData.conpassword || !formData.date_of_birth || !formData.address || !formData.bio){
       setError("All field Must be fullfilled")
       return
     }
@@ -102,8 +105,8 @@ const Signup = () => {
           <input
             type="text"
             onChange={handleChange}
-            value={formData.lastname}
-            name="lastname"
+            value={formData.last_name}
+            name="last_name"
             placeholder="Last name"
             className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-black placeholder-black focus:outline-none focus:ring-1 focus:ring-blue-600 focus:border-blue-600"
           />
@@ -131,6 +134,30 @@ const Signup = () => {
             value={formData.phone}
             name="phone"
             placeholder="Phone"
+            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-black placeholder-black focus:outline-none focus:ring-1 focus:ring-blue-600 focus:border-blue-600"
+          />
+          <input
+            type="text"
+            onChange={handleChange}
+            value={formData.address}
+            name="address"
+            placeholder="Address"
+            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-black placeholder-black focus:outline-none focus:ring-1 focus:ring-blue-600 focus:border-blue-600"
+          />
+          <input
+            type="text"
+            onChange={handleChange}
+            value={formData.weblink}
+            name="weblink"
+            placeholder="Web Link (Optional)"
+            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-black placeholder-black focus:outline-none focus:ring-1 focus:ring-blue-600 focus:border-blue-600"
+          />
+          <input
+            type="text"
+            onChange={handleChange}
+            value={formData.bio}
+            name="bio"
+            placeholder="Bio...."
             className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-black placeholder-black focus:outline-none focus:ring-1 focus:ring-blue-600 focus:border-blue-600"
           />
           <input

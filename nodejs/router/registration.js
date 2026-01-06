@@ -25,13 +25,11 @@ router.route("/registration").post(async(req,res)=>{
             { 
                 $set: { 
                 otp: otp,
-                 otpCreatedAt: new Date() // Optional: add timestamp for OTP creation
+                 otpCreatedAt: new Date() 
                  }
                 },
-                { new: true } // Returns the updated document
+                { new: true }
                 );
-
-                // Send password reset email
             const transporter = nodemailer.createTransport({
             service: "gmail",
             secure: false,

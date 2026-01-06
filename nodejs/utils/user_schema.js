@@ -21,7 +21,26 @@ const schema = new mongoose.Schema({
         type:Boolean,
         default:false
     },
-    otp:Number
+    otp:Number,
+    address:String,
+    bio:String,
+    followers:{
+        type:Number,
+        default:0,
+    },
+    following:{
+        type:Number,
+        default:0
+    },
+    posts:{
+        type:Number,
+        default:0
+    },
+    weblink:{
+        type:String,
+        default:""
+    }
+
 });
 
 schema.pre('save', async function() {

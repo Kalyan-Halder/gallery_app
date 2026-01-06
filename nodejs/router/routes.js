@@ -16,6 +16,7 @@ router.use(require("./update"))
 router.use(require("./create_post"))
 router.use(require("./verify"))
 router.use(require("./reset"))
+router.use(require("./profile"))
 
 
 module.exports  = router;

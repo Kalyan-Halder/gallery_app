@@ -9,7 +9,6 @@ const ConditionalHeader = () => {
 
   const checkToken = useCallback(() => {
     const token = localStorage.getItem("token");
-    console.log("Checking token:", token);
     
     if (token) {
       setLoggedIn(true);
