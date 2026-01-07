@@ -38,7 +38,6 @@ router.route("/create_post").post(uploadFields, async (req, res) => {
  
     const {
       user_name,
-      title,
       description,
       location,
       tags,
@@ -46,7 +45,7 @@ router.route("/create_post").post(uploadFields, async (req, res) => {
 
     
  
-    if (!title || !description) {
+    if (!description) {
       return res.status(400).json({
         success: false,
         message: "Title, and Description are required",
@@ -95,7 +94,6 @@ router.route("/create_post").post(uploadFields, async (req, res) => {
     const newPost = new post({
       user_id: userExist._id,
       user_name: user_name || "",  
-      title: title,
       description: description || "",
       location: location || "",     
       tags: tagsArray,              
@@ -110,7 +108,6 @@ router.route("/create_post").post(uploadFields, async (req, res) => {
       message: "Post created successfully",
       data: {
         postId: newPost._id,
-        title: newPost.title,
         imageUrl: newPost.url || null,
         location: newPost.location || "",
         tags: newPost.tags || [],

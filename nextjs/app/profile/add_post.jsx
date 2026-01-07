@@ -4,7 +4,6 @@ import { useState } from "react";
 const Add_Post = ({ open = false, onClose = () => {}, token = "" }) => {
   const [formData, setFormData] = useState({
     token:"",
-    title: "",
     description: "",
     location: "",
     tags: "", // comma separated string
@@ -35,8 +34,8 @@ const Add_Post = ({ open = false, onClose = () => {}, token = "" }) => {
     setError(" ");
     setSuccess(false);
 
-    if (!formData.title || !formData.description) {
-      setError("user_id, title, and description are required");
+    if (!formData.description || !formData.tags) {
+      setError("user_id, and description are required");
       return;
     }
 
@@ -51,7 +50,6 @@ const Add_Post = ({ open = false, onClose = () => {}, token = "" }) => {
       //Use multipart/form-data for file upload
       const fd = new FormData();
       fd.append("token", token);
-      fd.append("title", formData.title);
       fd.append("description", formData.description);
       fd.append("location", formData.location);
       fd.append("tags", JSON.stringify(tagsArray)); // send as JSON string
@@ -113,18 +111,11 @@ const Add_Post = ({ open = false, onClose = () => {}, token = "" }) => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-3">
-          <input
-            name="title"
-            type="text"
-            placeholder="Title"
-            value={formData.title}
-            onChange={handleChange}
-            className="w-full border text-black border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-600 focus:border-blue-600"
-          />
+           
 
           <textarea
             name="description"
-            placeholder="Description"
+            placeholder="Caption"
             value={formData.description}
             onChange={handleChange}
             rows={4}

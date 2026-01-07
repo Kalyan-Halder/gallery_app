@@ -9,96 +9,46 @@ const Feeds = () => {
   const [likedPosts, setLikedPosts] = useState(new Set());
   const [savedPosts, setSavedPosts] = useState(new Set());
 
-  // Mock posts data - in real app, this would come from an API
-  const mockPosts = [
-    {
-      id: 1,
-      user: {
-        name: "Sarah Miller",
-        username: "@sarahshots",
-        avatar: "SM",
-        color: "from-purple-500 to-pink-500"
-      },
-      image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-      caption: "Golden hour at the coast 🌅 The way the light dances on water never ceases to amaze me. #photography #goldenhour #ocean",
-      likes: 1245,
-      comments: 89,
-      shares: 42,
-      timestamp: "2 hours ago",
-      location: "Pacific Coast Highway"
-    },
-    {
-      id: 2,
-      user: {
-        name: "Mike Chen",
-        username: "@mikewide",
-        avatar: "MC",
-        color: "from-blue-500 to-cyan-500"
-      },
-      image: "https://images.unsplash.com/photo-1519681393784-d120267933ba",
-      caption: "Mountain perspectives 🏔️ Sometimes you have to climb to see the bigger picture. #landscape #mountains #naturephotography",
-      likes: 2341,
-      comments: 156,
-      shares: 78,
-      timestamp: "4 hours ago",
-      location: "Rocky Mountains"
-    },
-    {
-      id: 3,
-      user: {
-        name: "Lisa Park",
-        username: "@lisalens",
-        avatar: "LP",
-        color: "from-green-500 to-emerald-500"
-      },
-      image: "https://images.unsplash.com/photo-1475924156734-496f6cac6ec1",
-      caption: "Urban jungle vibes 🌆 Finding beauty in the concrete. #urbanphotography #cityscape #architecture",
-      likes: 987,
-      comments: 67,
-      shares: 23,
-      timestamp: "6 hours ago",
-      location: "New York City"
-    },
-    {
-      id: 4,
-      user: {
-        name: "David Wilson",
-        username: "@davidframe",
-        avatar: "DW",
-        color: "from-orange-500 to-yellow-500"
-      },
-      image: "https://images.unsplash.com/photo-1469474968028-56623f02e42e",
-      caption: "Wanderlust never sleeps ✈️ Every journey leaves a mark on your soul. #travelphotography #wanderlust #adventure",
-      likes: 3210,
-      comments: 210,
-      shares: 145,
-      timestamp: "1 day ago",
-      location: "Swiss Alps"
-    },
-    {
-      id: 5,
-      user: {
-        name: "Emma Thompson",
-        username: "@emmaframes",
-        avatar: "ET",
-        color: "from-pink-500 to-rose-500"
-      },
-      image: "https://images.unsplash.com/photo-1505142468610-359e7d316be0",
-      caption: "Morning dew magic 🌿 Nature's smallest details often hold the most beauty. #macrophotography #nature #details",
-      likes: 876,
-      comments: 54,
-      shares: 19,
-      timestamp: "1 day ago"
-    }
-  ];
-
   useEffect(() => {
     // Simulate API call
-    setTimeout(() => {
-      setPosts(mockPosts);
-      setLoading(false);
-    }, 1000);
+    const fetchData = async () => {
+      try{
+         const response = await fetch("http://localhost:8000/all_post", {
+            method: "GET",
+            headers: { "Content-Type": "application/json" }
+          });
+
+          const result = await response.json();
+          console.log("API Response:", result);
+          
+          if (!response.ok) {
+             throw new Error(result?.message || `Error: ${response.status}`);
+          } else {
+             // Check if data is in the expected format
+             const fetchedPosts = result.posts || result.data || result;
+             console.log("Fetched posts:", fetchedPosts);
+             
+             // Set posts directly from the API response
+             setPosts(fetchedPosts);
+             setLoading(false);
+          }
+          
+          
+      } catch(err) {
+          console.log("Error fetching posts:", err);
+          // Optionally, you can set some mock data if API fails
+          setPosts([]);
+          setLoading(false);
+      }
+    }
+   
+    fetchData();
   }, []);
+
+  // Debug: Log posts whenever it changes
+  useEffect(() => {
+    console.log("Posts state updated:", posts);
+  }, [posts]);
 
   const handleLike = (postId) => {
     const newLiked = new Set(likedPosts);
@@ -218,105 +168,126 @@ const Feeds = () => {
 
         {/* Posts Feed */}
         <div className="space-y-6">
-          {posts.map((post) => (
-            <div key={post.id} className="bg-white rounded-2xl shadow-sm overflow-hidden">
-              {/* Post Header */}
-              <div className="p-4">
-                <div className="flex items-center justify-between">
+          {posts.length > 0 ? (
+            posts.map((post) => (
+              <div key={post.id} className="bg-white rounded-2xl shadow-sm overflow-hidden">
+                {/* Post Header */}
+                <div className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className={`h-10 w-10 rounded-full bg-gradient-to-r ${post.user?.color || "from-gray-500 to-gray-700"} flex items-center justify-center text-white font-semibold`}>
+                        {post.user?.avatar || "UU"}
+                      </div>
+                      <div>
+                        <div className="font-semibold text-gray-900">{post.user?.name || "Unknown User"}</div>
+                        <div className="text-sm text-gray-600">{post.user?.username || "@unknown"}</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      {post.location && (
+                        <span className="text-sm text-gray-500">{post.location}</span>
+                      )}
+                      <button className="p-2 hover:bg-gray-100 rounded-full">
+                        <MoreVertical className="h-5 w-5 text-gray-500" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Post Image */}
+                <div className="relative">
+                  <div 
+                    className="h-96 bg-cover bg-center"
+                    style={{ backgroundImage: `url(${post.image})` }}
+                  />
+                  <button 
+                    onClick={() => handleSave(post.id || post._id)}
+                    className="absolute top-4 right-4 p-2 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white"
+                  >
+                    <Bookmark className={`h-5 w-5 ${savedPosts.has(post.id || post._id) ? 'text-yellow-500 fill-yellow-500' : 'text-gray-700'}`} />
+                  </button>
+                </div>
+
+                {/* Post Actions */}
+                <div className="p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center space-x-4">
+                      <button 
+                        onClick={() => handleLike(post.id || post._id)}
+                        className="flex items-center space-x-1"
+                      >
+                        <Heart className={`h-6 w-6 ${likedPosts.has(post.id || post._id) ? 'text-red-500 fill-red-500' : 'text-gray-700'}`} />
+                        <span className="font-medium text-gray-900">{(post.likes || 0).toLocaleString()}</span>
+                      </button>
+                      <button className="flex items-center space-x-1">
+                        <MessageCircle className="h-6 w-6 text-gray-700" />
+                        <span className="font-medium text-gray-900">{post.comments || 0}</span>
+                      </button>
+                      <button 
+                        onClick={() => handleShare(post.id || post._id)}
+                        className="flex items-center space-x-1"
+                      >
+                        <Share2 className="h-6 w-6 text-gray-700" />
+                        <span className="font-medium text-gray-900">{post.shares || 0}</span>
+                      </button>
+                    </div>
+                    <span className="text-sm text-gray-500">{post.timestamp || "Recently"}</span>
+                  </div>
+
+                  {/* Caption */}
+                  <div className="mb-4">
+                    <p className="text-gray-800">
+                      <span className="font-semibold text-gray-900">{post.user?.username || "@unknown"}</span> {post.caption || ""}
+                    </p>
+                  </div>
+                  {post.tags && post.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {post.tags.map((tag, index) => (
+                      <span 
+                        key={index}
+                        className="px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded-full"
+                      >
+                        #{tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                  {/* Comment Input */}
                   <div className="flex items-center space-x-3">
-                    <div className={`h-10 w-10 rounded-full bg-gradient-to-r ${post.user.color} flex items-center justify-center text-white font-semibold`}>
-                      {post.user.avatar}
+                    <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
+                      <span className="text-xs text-gray-600">Y</span>
                     </div>
-                    <div>
-                      <div className="font-semibold text-gray-900">{post.user.name}</div>
-                      <div className="text-sm text-gray-600">{post.user.username}</div>
+                    <div className="flex-1 relative">
+                      <input
+                        type="text"
+                        placeholder="Add a comment..."
+                        className="w-full px-4 py-2 bg-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                      <button className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1">
+                        <Send className="h-4 w-4 text-gray-500" />
+                      </button>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    {post.location && (
-                      <span className="text-sm text-gray-500">{post.location}</span>
-                    )}
-                    <button className="p-2 hover:bg-gray-100 rounded-full">
-                      <MoreVertical className="h-5 w-5 text-gray-500" />
-                    </button>
-                  </div>
                 </div>
               </div>
-
-              {/* Post Image */}
-              <div className="relative">
-                <div 
-                  className="h-96 bg-cover bg-center"
-                  style={{ backgroundImage: `url(${post.image})` }}
-                />
-                <button 
-                  onClick={() => handleSave(post.id)}
-                  className="absolute top-4 right-4 p-2 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white"
-                >
-                  <Bookmark className={`h-5 w-5 ${savedPosts.has(post.id) ? 'text-yellow-500 fill-yellow-500' : 'text-gray-700'}`} />
-                </button>
-              </div>
-
-              {/* Post Actions */}
-              <div className="p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center space-x-4">
-                    <button 
-                      onClick={() => handleLike(post.id)}
-                      className="flex items-center space-x-1"
-                    >
-                      <Heart className={`h-6 w-6 ${likedPosts.has(post.id) ? 'text-red-500 fill-red-500' : 'text-gray-700'}`} />
-                      <span className="font-medium text-gray-900">{post.likes.toLocaleString()}</span>
-                    </button>
-                    <button className="flex items-center space-x-1">
-                      <MessageCircle className="h-6 w-6 text-gray-700" />
-                      <span className="font-medium text-gray-900">{post.comments}</span>
-                    </button>
-                    <button 
-                      onClick={() => handleShare(post.id)}
-                      className="flex items-center space-x-1"
-                    >
-                      <Share2 className="h-6 w-6 text-gray-700" />
-                      <span className="font-medium text-gray-900">{post.shares}</span>
-                    </button>
-                  </div>
-                  <span className="text-sm text-gray-500">{post.timestamp}</span>
-                </div>
-
-                {/* Caption */}
-                <div className="mb-4">
-                  <p className="text-gray-800">
-                    <span className="font-semibold text-gray-900">{post.user.username}</span> {post.caption}
-                  </p>
-                </div>
-
-                {/* Comment Input */}
-                <div className="flex items-center space-x-3">
-                  <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
-                    <span className="text-xs text-gray-600">Y</span>
-                  </div>
-                  <div className="flex-1 relative">
-                    <input
-                      type="text"
-                      placeholder="Add a comment..."
-                      className="w-full px-4 py-2 bg-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                    <button className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1">
-                      <Send className="h-4 w-4 text-gray-500" />
-                    </button>
-                  </div>
-                </div>
-              </div>
+            ))
+          ) : (
+            <div className="bg-white rounded-2xl shadow-sm p-8 text-center">
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">No posts yet</h3>
+              <p className="text-gray-600">Be the first to share your moments!</p>
             </div>
-          ))}
+          )}
         </div>
 
         {/* Load More */}
-        <div className="text-center py-8">
-          <button className="px-6 py-3 bg-white border border-gray-300 rounded-full text-gray-700 hover:bg-gray-50 transition-colors">
-            Load More Posts
-          </button>
-        </div>
+        {posts.length > 0 && (
+          <div className="text-center py-8">
+            <button className="px-6 py-3 bg-white border border-gray-300 rounded-full text-gray-700 hover:bg-gray-50 transition-colors">
+              Load More Posts
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Floating Action Button for Mobile */}

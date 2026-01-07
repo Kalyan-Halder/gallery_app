@@ -8,6 +8,7 @@ const Profile = () => {
   const [isFollowing, setIsFollowing] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [user_token, setToken] = useState(false)
+  const [posts, setPosts] = useState([])
 
   const [toggle, setToggle] = useState(false)
   const toggle_button = ()=>{
@@ -48,10 +49,18 @@ const Profile = () => {
         body: JSON.stringify({ token }),
       });
 
-      const result = await response.json();
-      console.log("Result:", result);
+      const posts = await fetch("http://localhost:8000/self_post", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token }),
+      });
 
-      if (!response.ok) {
+      const result = await response.json();
+      const data = await posts.json();
+      //console.log("Result:", result);
+      //console.log("posts", data.post);
+
+      if (!response.ok || !posts.ok) {
         throw new Error(result?.message || `Error: ${response.status}`);
       }else{
         const initials = (result.first_name?.[0] ?? "") + (result.last_name?.[0] ?? "");
@@ -67,7 +76,9 @@ const Profile = () => {
           joinDate: `Joined ${result.dateStr}`,
           initial: initials
         })
-      }
+
+        setPosts(data.post)}
+        console.log(posts)
       
     } catch (err) {
       console.error("Fetch error:", err);
@@ -80,6 +91,7 @@ const Profile = () => {
       fetchData();
     }, []);
 
+    {/*  
   const posts = [
     { id: 1, likes: 245, comments: 32, image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb" },
     { id: 2, likes: 189, comments: 21, image: "https://images.unsplash.com/photo-1519681393784-d120267933ba" },
@@ -88,6 +100,7 @@ const Profile = () => {
     { id: 5, likes: 321, comments: 29, image: "https://images.unsplash.com/photo-1505142468610-359e7d316be0" },
     { id: 6, likes: 278, comments: 34, image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b" },
   ];
+  */}
 
   const savedPosts = [
     { id: 7, likes: 567, comments: 42, image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4" },
@@ -249,10 +262,10 @@ const Profile = () => {
           {renderPosts().length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {renderPosts().map((post) => (
-                <div key={post.id} className="group relative aspect-square rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300">
+                <div key={post._id} className="group relative aspect-square rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300">
                   <div 
                     className="h-full w-full bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
-                    style={{ backgroundImage: `url(${post.image})` }}
+                    style={{ backgroundImage: `url(${post.url})` }}
                   />
                   <div className="absolute inset-0 bg-linear-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-white">

@@ -1,6 +1,7 @@
 const express = require("express")
 const router = express.Router()
 const user = require("../utils/user_schema");
+const posts = require("../utils/post_schema")
 
 
 router.route("/profile").post(async (req, res) =>{
@@ -39,6 +40,30 @@ router.route("/profile").post(async (req, res) =>{
             }
         }
         res.status(200).json({message:"hi"})
+    }catch(err){
+        console.log(err)
+    }
+})
+
+router.route("/self_post").post(async (req,res)=>{
+    try{
+        const {token} = req.body
+        if(!token){
+            return res.status(400).json({message:"Something Went Worng"})
+        }else{
+            const userExist = await user.findOne({token})
+            if(!userExist){
+                res.status(401).json({message:"Something Went Worng"})
+            }else{
+                const post = await posts.find({user_id:userExist._id})
+                if(!post){
+                    return res.status(404).json({message:"No Post Found"})
+                }else{
+                    return res.status(200).json({post})
+                }
+            }
+        }
+
     }catch(err){
         console.log(err)
     }

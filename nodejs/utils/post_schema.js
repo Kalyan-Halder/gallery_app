@@ -3,7 +3,6 @@ const mongoose = require("mongoose")
 const schema = new mongoose.Schema({
     user_id:String,
     username:String,
-    title:String,
     description:String,
     url:String,
     location:String,
@@ -11,6 +10,14 @@ const schema = new mongoose.Schema({
     created_at: {
         type:Date,
         default: Date.now()
+    },
+    likes:{
+        type: Number,
+        default: 0
+    },
+    comments:{
+        type:Number,
+        default: 0
     }
 })
 
