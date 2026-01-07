@@ -7,7 +7,7 @@ const schema = new mongoose.Schema({
     description:String,
     url:String,
     location:String,
-    tags:String,
+    tags:Array,
     created_at: {
         type:Date,
         default: Date.now()

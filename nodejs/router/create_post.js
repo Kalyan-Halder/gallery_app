@@ -2,93 +2,127 @@ const express = require("express");
 const router = express.Router();
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
-const { CloudinaryStorage } = require("multer-storage-cloudinary");
 
-// Calling Post Schema
+ 
 const post = require("../utils/post_schema");
+const user = require("../utils/user_schema");
 
 const dotenv = require("dotenv");
 dotenv.config({ path: "../config.env" });
-
-// Cloudinary Configuration
+ 
 cloudinary.config({
   cloud_name: "dmmimbiq4",
   api_key: process.env.API_KEY,
   api_secret: process.env.CLOUDINARY_API,
 });
 
-// Set up multer for memory storage (temporary storage in RAM)
+ 
 const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+const upload = multer({ storage });
+ 
+const uploadFields = upload.fields([
+  { name: "file", maxCount: 1 },
+  { name: "image", maxCount: 1 },
+]);
 
-
-
-// POST route - now with file upload handling
-router.route('/create_post').post(upload.single('image'), async (req, res) => {
+router.route("/create_post").post(uploadFields, async (req, res) => {
   try {
     console.log("Received request body:", req.body);
-    console.log("Received file:", req.file);
+    console.log("Received files:", req.files);
 
-    // Check if file was uploaded
-    if (!req.file) {
+    
+    const uploadedFile =
+      (req.files?.file && req.files.file[0]) ||
+      (req.files?.image && req.files.image[0]) ||
+      null;
+ 
+    const {
+      user_name,
+      title,
+      description,
+      location,
+      tags,
+    } = req.body;
+
+    
+ 
+    if (!title || !description) {
       return res.status(400).json({
         success: false,
-        message: "Please upload an image file"
+        message: "Title, and Description are required",
+      });
+    }
+    const userExist = await user.findOne({token:req.body.token})
+    if(!userExist){
+      return res.status(400).json({
+        success: false,
+        message: "Something Went Wrong",
       });
     }
 
-    // Get text data from request body
-    const { user_Id, user_name, title, description } = req.body;
+   
+    let tagsArray = [];
+    try {
+      if (tags) {
+        tagsArray = Array.isArray(tags) ? tags : JSON.parse(tags);
+        if (!Array.isArray(tagsArray)) tagsArray = [];
+      }
+    } catch (e) {
+      tagsArray = [];
+    }
 
-     
+    let imageUrl = "";
 
-    // Convert file buffer to base64 for Cloudinary
-    const fileStr = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
+    
+    if (uploadedFile) {
+      const fileStr = `data:${uploadedFile.mimetype};base64,${uploadedFile.buffer.toString("base64")}`;
 
-    // Upload to Cloudinary
-    const uploadResponse = await cloudinary.uploader.upload(fileStr, {
-      folder: "posts",
-      public_id: `post_${Date.now()}`,
-      transformation: [
-        { width: 1000, height: 1000, crop: "limit" },
-        { quality: "auto" },
-        { fetch_format: "auto" }
-      ]
-    });
+      const uploadResponse = await cloudinary.uploader.upload(fileStr, {
+        folder: `posts/${userExist.username}`,
+        public_id: `post_${Date.now()}`,
+        transformation: [
+          { width: 1000, height: 1000, crop: "limit" },
+          { quality: "auto" },
+          { fetch_format: "auto" },
+        ],
+      });
 
-    console.log("Cloudinary upload successful:", uploadResponse.secure_url);
+      console.log("Cloudinary upload successful:", uploadResponse.secure_url);
+      imageUrl = uploadResponse.secure_url;
+    }
 
-    // Create new post document with Cloudinary URL
+    
     const newPost = new post({
-      user_Id: user_Id,
-      user_name: user_name,
+      user_id: userExist._id,
+      user_name: user_name || "",  
       title: title,
       description: description || "",
-      url: uploadResponse.secure_url, 
-      created_at: new Date()
+      location: location || "",     
+      tags: tagsArray,              
+      url: imageUrl,               
+      created_at: new Date(),
     });
 
-    // Save to database
     await newPost.save();
 
-    // Return success response
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       message: "Post created successfully",
       data: {
         postId: newPost._id,
         title: newPost.title,
-        imageUrl: newPost.url,
-        createdAt: newPost.created_at
-      }
+        imageUrl: newPost.url || null,
+        location: newPost.location || "",
+        tags: newPost.tags || [],
+        createdAt: newPost.created_at,
+      },
     });
-
   } catch (error) {
     console.error("Create post error:", error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: "Failed to create post",
-      error: error.message
+      error: error.message,
     });
   }
 });

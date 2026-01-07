@@ -7,6 +7,7 @@ const Profile = () => {
   const [activeTab, setActiveTab] = useState("posts");
   const [isFollowing, setIsFollowing] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [user_token, setToken] = useState(false)
 
   const [toggle, setToggle] = useState(false)
   const toggle_button = ()=>{
@@ -28,7 +29,8 @@ const Profile = () => {
     joinDate: "",
     followers: "",
     following: "",
-    posts: ""
+    posts: "",
+    initial:""
   });
 
  
@@ -39,7 +41,7 @@ const Profile = () => {
       setLoading(true);
 
       const token = localStorage.getItem("token");
-
+      setToken(token)
       const response = await fetch("http://localhost:8000/profile", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -52,6 +54,7 @@ const Profile = () => {
       if (!response.ok) {
         throw new Error(result?.message || `Error: ${response.status}`);
       }else{
+        const initials = (result.first_name?.[0] ?? "") + (result.last_name?.[0] ?? "");
         setProfileData({
           name : `${result.first_name} ${result.last_name}`,
           username : `@${result.username}`,
@@ -62,7 +65,7 @@ const Profile = () => {
           location: result.address,
           website: result.weblink,
           joinDate: `Joined ${result.dateStr}`,
-
+          initial: initials
         })
       }
       
@@ -131,7 +134,7 @@ const Profile = () => {
                   <div className="h-32 w-32 md:h-40 md:w-40 rounded-2xl border-4 border-white shadow-lg bg-linear-to-br from-blue-400 to-purple-500 overflow-hidden">
                     {/* Placeholder for profile image */}
                     <div className="h-full w-full flex items-center justify-center text-white text-5xl font-bold">
-                      KH
+                      {`${profileData.initial}`}
                     </div>
                   </div>
                   <button className="absolute bottom-2 right-2 p-2 bg-white rounded-full shadow-md hover:shadow-lg transition-shadow">
@@ -166,7 +169,7 @@ const Profile = () => {
                           <MoreVertical className="h-5 w-5 text-gray-700" />
                         </button>
                       </div>
-                      <button onClick={toggle_button} className="p-2 border border-gray-300 rounded-full hover:pointer transition-colors">
+                      <button onClick={toggle_button} className="p-2 border border-gray-300 rounded-full hover:pointer transition-colors hover:bg-blue-300">
                         <Plus className="h-5 w-5 text-gray-700" />
                       </button>
                     </div>
@@ -208,7 +211,7 @@ const Profile = () => {
                     </div>
                     <div>
                     </div>
-                    {toggle && (<Add_Post open={toggle} onClose={toggle_button}/>)}
+                    {toggle && (<Add_Post open={toggle} onClose={toggle_button} token={user_token}/>)}
                   </div>
                 </div>
               </div>

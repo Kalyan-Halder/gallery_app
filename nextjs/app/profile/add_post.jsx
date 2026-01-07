@@ -1,17 +1,15 @@
 "use client";
 import { useState } from "react";
 
-const Add_Post = ({ open = false, onClose = () => {}, userId = "" }) => {
+const Add_Post = ({ open = false, onClose = () => {}, token = "" }) => {
   const [formData, setFormData] = useState({
-    user_id: userId,
+    token:"",
     title: "",
     description: "",
     location: "",
     tags: "", // comma separated string
   });
-
   const [file, setFile] = useState(null); // ✅ file state
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(" ");
   const [success, setSuccess] = useState(false);
@@ -37,12 +35,12 @@ const Add_Post = ({ open = false, onClose = () => {}, userId = "" }) => {
     setError(" ");
     setSuccess(false);
 
-    if (!formData.user_id || !formData.title || !formData.description) {
+    if (!formData.title || !formData.description) {
       setError("user_id, title, and description are required");
       return;
     }
 
-    // tags -> array
+  
     const tagsArray = formData.tags
       ? formData.tags.split(",").map((t) => t.trim()).filter(Boolean)
       : [];
@@ -50,9 +48,9 @@ const Add_Post = ({ open = false, onClose = () => {}, userId = "" }) => {
     try {
       setLoading(true);
 
-      // ✅ Use multipart/form-data for file upload
+      //Use multipart/form-data for file upload
       const fd = new FormData();
-      fd.append("user_id", formData.user_id);
+      fd.append("token", token);
       fd.append("title", formData.title);
       fd.append("description", formData.description);
       fd.append("location", formData.location);
@@ -62,9 +60,8 @@ const Add_Post = ({ open = false, onClose = () => {}, userId = "" }) => {
         fd.append("file", file); // key name "file" (backend should match)
       }
 
-      const response = await fetch("http://localhost:8000/posts", {
+      const response = await fetch("http://localhost:8000/create_post", {
         method: "POST",
-        // ❌ don't set Content-Type manually for FormData
         body: fd,
       });
 
@@ -108,7 +105,7 @@ const Add_Post = ({ open = false, onClose = () => {}, userId = "" }) => {
           <button
             type="button"
             onClick={onClose}
-            className="ml-3 inline-flex h-9 w-9 items-center justify-center rounded-full hover:bg-gray-100"
+            className="ml-3 inline-flex h-9 w-9 items-center justify-center rounded-full  bg-black hover:bg-red-500"
             aria-label="Close"
           >
             ✕
@@ -116,15 +113,6 @@ const Add_Post = ({ open = false, onClose = () => {}, userId = "" }) => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-3">
-          <input
-            name="user_id"
-            type="text"
-            placeholder="User ID"
-            value={formData.user_id}
-            onChange={handleChange}
-            className="w-full border text-black border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-600 focus:border-blue-600"
-          />
-
           <input
             name="title"
             type="text"
