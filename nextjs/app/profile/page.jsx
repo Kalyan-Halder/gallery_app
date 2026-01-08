@@ -2,13 +2,14 @@
 import Add_Post from "./add_post"
 import { useState, useEffect } from "react";
 import { Plus, Camera, Heart, MessageCircle, Share2, MoreVertical, Edit, Settings, LogOut, Grid, Bookmark, UserPlus, Users, MapPin, Calendar, Link as LinkIcon, MessageCirclePlus } from "lucide-react";
-
+import { useRouter } from "next/navigation";
 const Profile = () => {
   const [activeTab, setActiveTab] = useState("posts");
   const [isFollowing, setIsFollowing] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [user_token, setToken] = useState(false)
   const [posts, setPosts] = useState([])
+  const router = useRouter()
 
   const [toggle, setToggle] = useState(false)
   const toggle_button = ()=>{
@@ -77,8 +78,10 @@ const Profile = () => {
           initial: initials
         })
 
-        setPosts(data.post)}
-        console.log(posts)
+        setPosts(data.post)
+        
+      }
+         
       
     } catch (err) {
       console.error("Fetch error:", err);
@@ -91,16 +94,6 @@ const Profile = () => {
       fetchData();
     }, []);
 
-    {/*  
-  const posts = [
-    { id: 1, likes: 245, comments: 32, image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb" },
-    { id: 2, likes: 189, comments: 21, image: "https://images.unsplash.com/photo-1519681393784-d120267933ba" },
-    { id: 3, likes: 432, comments: 45, image: "https://images.unsplash.com/photo-1475924156734-496f6cac6ec1" },
-    { id: 4, likes: 156, comments: 18, image: "https://images.unsplash.com/photo-1469474968028-56623f02e42e" },
-    { id: 5, likes: 321, comments: 29, image: "https://images.unsplash.com/photo-1505142468610-359e7d316be0" },
-    { id: 6, likes: 278, comments: 34, image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b" },
-  ];
-  */}
 
   const savedPosts = [
     { id: 7, likes: 567, comments: 42, image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4" },
@@ -224,7 +217,7 @@ const Profile = () => {
                     </div>
                     <div>
                     </div>
-                    {toggle && (<Add_Post open={toggle} onClose={toggle_button} token={user_token}/>)}
+                    {toggle && (<Add_Post open={toggle} onClose={toggle_button} token={user_token} />)}
                   </div>
                 </div>
               </div>

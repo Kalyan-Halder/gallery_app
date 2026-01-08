@@ -16,21 +16,21 @@ const Contact = () => {
     {
       icon: <Mail className="h-6 w-6" />,
       title: "Email Us",
-      info: "support@shuttersphere.com",
+      info: "demolink5355@gmail.com",
       subinfo: "We'll reply within 24 hours",
       color: "from-blue-500 to-cyan-500"
     },
     {
       icon: <Phone className="h-6 w-6" />,
       title: "Call Us",
-      info: "+1 (555) 123-4567",
+      info: "+880188*******",
       subinfo: "Mon-Fri, 9AM-6PM EST",
       color: "from-purple-500 to-pink-500"
     },
     {
       icon: <MapPin className="h-6 w-6" />,
       title: "Visit Us",
-      info: "San Francisco, CA",
+      info: "Barishal, Bangladesh",
       subinfo: "By appointment only",
       color: "from-green-500 to-emerald-500"
     },
@@ -73,16 +73,16 @@ const Contact = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100">
       {/* Hero Section */}
       <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 opacity-5"></div>
+        <div className="absolute inset-0 bg-linear-to-r from-blue-600 via-purple-600 to-pink-600 opacity-5"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="text-center">
-            <div className="inline-flex items-center justify-center p-4 bg-gradient-to-r from-blue-500 to-purple-500 rounded-3xl mb-6">
+            <div className="inline-flex items-center justify-center p-4 bg-linear-to-r from-blue-500 to-purple-500 rounded-3xl mb-6">
               <MessageSquare className="h-8 w-8 text-white" />
             </div>
-            <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-6">
+            <h1 className="text-4xl md:text-6xl font-bold bg-linear-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-6">
               Get in Touch
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
@@ -100,7 +100,7 @@ const Contact = () => {
             <div className="grid sm:grid-cols-2 gap-6 mb-12">
               {contactInfo.map((item, index) => (
                 <div key={index} className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow">
-                  <div className={`inline-flex p-3 rounded-xl bg-gradient-to-r ${item.color} mb-4`}>
+                  <div className={`inline-flex p-3 rounded-xl bg-linear-to-r ${item.color} mb-4`}>
                     <div className="text-white">{item.icon}</div>
                   </div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">{item.title}</h3>
@@ -115,22 +115,22 @@ const Contact = () => {
               <h3 className="text-2xl font-bold text-gray-900 mb-6">Follow Us</h3>
               <div className="flex space-x-4">
                 <a href="#" className="group">
-                  <div className="p-3 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl group-hover:scale-110 transition-transform">
+                  <div className="p-3 bg-linear-to-r from-blue-500 to-cyan-500 rounded-xl group-hover:scale-110 transition-transform">
                     <Facebook className="h-6 w-6 text-white" />
                   </div>
                 </a>
                 <a href="#" className="group">
-                  <div className="p-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl group-hover:scale-110 transition-transform">
+                  <div className="p-3 bg-linear-to-r from-purple-500 to-pink-500 rounded-xl group-hover:scale-110 transition-transform">
                     <Instagram className="h-6 w-6 text-white" />
                   </div>
                 </a>
                 <a href="#" className="group">
-                  <div className="p-3 bg-gradient-to-r from-sky-500 to-blue-500 rounded-xl group-hover:scale-110 transition-transform">
+                  <div className="p-3 bg-linear-to-r from-sky-500 to-blue-500 rounded-xl group-hover:scale-110 transition-transform">
                     <Twitter className="h-6 w-6 text-white" />
                   </div>
                 </a>
                 <a href="#" className="group">
-                  <div className="p-3 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl group-hover:scale-110 transition-transform">
+                  <div className="p-3 bg-linear-to-r from-green-500 to-emerald-500 rounded-xl group-hover:scale-110 transition-transform">
                     <Globe className="h-6 w-6 text-white" />
                   </div>
                 </a>
@@ -145,14 +145,14 @@ const Contact = () => {
 
             {submitted ? (
               <div className="text-center py-12">
-                <div className="inline-flex p-4 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl mb-6">
+                <div className="inline-flex p-4 bg-linear-to-r from-green-500 to-emerald-500 rounded-2xl mb-6">
                   <CheckCircle className="h-12 w-12 text-white" />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">Message Sent Successfully!</h3>
                 <p className="text-gray-600 mb-8">Thank you for reaching out. We'll get back to you within 24 hours.</p>
                 <button
                   onClick={() => setSubmitted(false)}
-                  className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-full hover:opacity-90 transition-opacity"
+                  className="px-6 py-3 bg-linear-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-full hover:opacity-90 transition-opacity"
                 >
                   Send Another Message
                 </button>
@@ -243,17 +243,17 @@ const Contact = () => {
         </div>
 
         {/* Map Section */}
-        <div className="mt-16 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-2xl overflow-hidden shadow-2xl">
+        <div className="mt-16 bg-linear-to-r from-blue-600 via-purple-600 to-pink-600 rounded-2xl overflow-hidden shadow-2xl">
           <div className="p-8 text-center text-white">
             <h3 className="text-2xl font-bold mb-2">Visit Our Headquarters</h3>
             <p className="text-blue-100 mb-6">123 Creative Street, San Francisco, CA 94107</p>
-            <div className="aspect-video bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl overflow-hidden">
+            <div className="aspect-video bg-linear-to-br from-gray-800 to-gray-900 rounded-xl overflow-hidden">
               {/* Map Placeholder - In a real app, you'd embed Google Maps here */}
               <div className="h-full flex items-center justify-center">
                 <div className="text-center">
                   <Globe className="h-16 w-16 mx-auto mb-4 text-gray-400" />
                   <p className="text-gray-300">Interactive Map</p>
-                  <p className="text-gray-400 text-sm mt-2">Google Maps integration available</p>
+                  <p className="text-gray-400 text-sm mt-2">Google Maps integration ( Will be added later)</p>
                 </div>
               </div>
             </div>

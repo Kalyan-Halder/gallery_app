@@ -1,13 +1,21 @@
 "use client";
+import Add_Post from "./add_post";
 import { useState, useEffect } from "react";
-import { Heart, MessageCircle, Send, Bookmark, MoreVertical, Share2, Camera, Filter, Search } from "lucide-react";
-
+import {MapMinus, Heart, MessageCircle, Send, Bookmark, MoreVertical, Share2, Camera, Filter, Search } from "lucide-react";
+<MapMinus />
 const Feeds = () => {
   const [activeFilter, setActiveFilter] = useState("following");
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [likedPosts, setLikedPosts] = useState(new Set());
   const [savedPosts, setSavedPosts] = useState(new Set());
+
+  const [toggle, setToggle] = useState(false)
+  const [user_token, setToken] = useState(false)
+  const toggle_button = ()=>{
+      console.log(toggle)
+      setToggle(!toggle)
+  }
 
   useEffect(() => {
     // Simulate API call
@@ -32,6 +40,8 @@ const Feeds = () => {
              setPosts(fetchedPosts);
              setLoading(false);
           }
+          const token = localStorage.getItem("token");
+          setToken(token)
           
           
       } catch(err) {
@@ -125,27 +135,17 @@ const Feeds = () => {
       <div className="max-w-2xl mx-auto px-4 py-6">
         {/* Create Post Card */}
         <div className="bg-white rounded-2xl shadow-sm p-4 mb-6">
-          <div className="flex items-center space-x-3 mb-4">
-            <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white font-semibold">
-              Y
-            </div>
-            <div className="flex-1">
-              <button className="w-full text-left px-4 py-3 bg-gray-100 rounded-full text-gray-500 hover:bg-gray-200 transition-colors">
-                Share your moment...
-              </button>
-            </div>
-          </div>
           <div className="flex justify-between px-4">
             <button className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors">
               <Camera className="h-5 w-5" />
               <span>Photo/Video</span>
             </button>
-            <button className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full hover:opacity-90 transition-opacity">
+            <button onClick={toggle_button} className="px-4 py-2 bg-linear-to-r from-blue-500 to-purple-500 text-white rounded-full hover:opacity-90 transition-opacity">
               Post
             </button>
           </div>
         </div>
-
+        {toggle && (<Add_Post open={toggle} onClose={toggle_button} token={user_token} />)}
         {/* Filter Tabs */}
         <div className="flex space-x-2 mb-6 overflow-x-auto">
           {filters.map((filter) => (
@@ -154,7 +154,7 @@ const Feeds = () => {
               onClick={() => setActiveFilter(filter.id)}
               className={`px-4 py-2 rounded-full whitespace-nowrap transition-all ${
                 activeFilter === filter.id
-                  ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white"
+                  ? "bg-linear-to-r from-blue-500 to-purple-500 text-white"
                   : "bg-white text-gray-600 hover:bg-gray-100"
               }`}
             >
@@ -185,7 +185,7 @@ const Feeds = () => {
                     </div>
                     <div className="flex items-center space-x-2">
                       {post.location && (
-                        <span className="text-sm text-gray-500">{post.location}</span>
+                        <span className="text-sm text-gray-500 flex gap-2 justify-baseline align-middle">{post.location} <MapMinus color="blue"  ></MapMinus></span>
                       )}
                       <button className="p-2 hover:bg-gray-100 rounded-full">
                         <MoreVertical className="h-5 w-5 text-gray-500" />
