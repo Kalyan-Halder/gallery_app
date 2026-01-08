@@ -54,7 +54,7 @@ const Signin = () => {
         localStorage.setItem('token', data.token)
         window.dispatchEvent(new Event('tokenChange'));
         setTimeout(() => {
-        router.push("/");
+        router.push("/feeds");
         },500);
       }else if (response.status == 401){
         setError("User is Not Verified. Needs Verification")

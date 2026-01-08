@@ -1,5 +1,7 @@
 "use client";
 import Add_Post from "./add_post"
+import Edit_Profile_Photos from "./edit_profile";
+import Image from "next/image";
 import { useState, useEffect } from "react";
 import { Plus, Camera, Heart, MessageCircle, Share2, MoreVertical, Edit, Settings, LogOut, Grid, Bookmark, UserPlus, Users, MapPin, Calendar, Link as LinkIcon, MessageCirclePlus } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -10,11 +12,16 @@ const Profile = () => {
   const [user_token, setToken] = useState(false)
   const [posts, setPosts] = useState([])
   const router = useRouter()
-
+  
+  const [edit_toggle, setEditToggle] = useState(false)
   const [toggle, setToggle] = useState(false)
   const toggle_button = ()=>{
       console.log(toggle)
       setToggle(!toggle)
+  }
+  const edit_toggle_button = ()=>{
+      console.log(toggle)
+      setEditToggle(!edit_toggle)
   }
   
   //const token = localStorage.getItem('token')
@@ -32,7 +39,9 @@ const Profile = () => {
     followers: "",
     following: "",
     posts: "",
-    initial:""
+    initial:"",
+    coverUrl:"",
+    avatarUrl:""
   });
 
  
@@ -58,7 +67,7 @@ const Profile = () => {
 
       const result = await response.json();
       const data = await posts.json();
-      //console.log("Result:", result);
+      console.log("Result:", result);
       //console.log("posts", data.post);
 
       if (!response.ok || !posts.ok) {
@@ -75,13 +84,14 @@ const Profile = () => {
           location: result.address,
           website: result.weblink,
           joinDate: `Joined ${result.dateStr}`,
-          initial: initials
+          initial: initials,
+          coverUrl : result.coverUrl,
+          avatarUrl: result.avatarUrl
         })
 
         setPosts(data.post)
         
       }
-         
       
     } catch (err) {
       console.error("Fetch error:", err);
@@ -122,10 +132,9 @@ const Profile = () => {
     <div className="min-h-screen bg-gray-50">
       {/* Cover Photo */}
       <div className="relative h-64 md:h-80 bg-linear-to-r from-blue-600 via-purple-600 to-pink-600">
-        <div className="absolute inset-0 bg-black/30"></div>
-        <button className="absolute top-4 right-4 p-2 bg-white/20 backdrop-blur-sm rounded-full hover:bg-white/30 transition-colors">
-          <Camera className="h-5 w-5 text-white" />
-        </button>
+        <div className="absolute inset-0 bg-black/30">
+             <div className="h-full w-full bg-cover bg-center transition-transform duration-500 group-hover:scale-110" style={{ backgroundImage: `url(${profileData.coverUrl})` }}/>
+        </div>
       </div>
 
       {/* Profile Info */}
@@ -140,10 +149,17 @@ const Profile = () => {
                   <div className="h-32 w-32 md:h-40 md:w-40 rounded-2xl border-4 border-white shadow-lg bg-linear-to-br from-blue-400 to-purple-500 overflow-hidden">
                     {/* Placeholder for profile image */}
                     <div className="h-full w-full flex items-center justify-center text-white text-5xl font-bold">
-                      {`${profileData.initial}`}
-                    </div>
+                    {!profileData.avatarUrl ? (
+                      <span>{profileData.initial}</span>
+                    ) : (
+                      <div
+                        className="h-full w-full bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
+                        style={{ backgroundImage: `url(${profileData.avatarUrl})` }}
+                      />
+                    )}
                   </div>
-                  <button className="absolute bottom-2 right-2 p-2 bg-white rounded-full shadow-md hover:shadow-lg transition-shadow">
+                  </div>
+                  <button className="absolute bottom-2 right-2 p-2 bg-white rounded-full shadow-md hover:shadow-lg transition-shadow" onClick={edit_toggle_button}>
                     <Edit className="h-4 w-4 text-gray-700" />
                   </button>
                 </div>
@@ -218,6 +234,7 @@ const Profile = () => {
                     <div>
                     </div>
                     {toggle && (<Add_Post open={toggle} onClose={toggle_button} token={user_token} />)}
+                    {edit_toggle && (<Edit_Profile_Photos open={edit_toggle} onClose={edit_toggle_button} token={user_token} />)}
                   </div>
                 </div>
               </div>

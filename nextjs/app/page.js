@@ -11,9 +11,7 @@ const PHOTOS = [
   '/home3.jpg',
   '/home4.jpg',
   '/home5.jpg',
-  '/home6.jpg',
-  '/home7.jpg',
-  '/home8.jpg',
+   
 ];
 
 const CTA_CLASS =
@@ -65,8 +63,8 @@ function AnimatedBurst({ onDone, spreadDone }) {
     const count = PHOTOS.length;
 
     // bigger spread radius
-    const RADIUS = 340;
-    const Y_SQUASH = 0.68;
+    const RADIUS = 240;
+    const Y_SQUASH = 0.88;
 
     // EDIT THIS to change starting point of the circle:
     // 0 = right, -Math.PI/2 = top, Math.PI/2 = bottom, Math.PI = left
@@ -189,7 +187,7 @@ export default function HomePage() {
                 initial={{ opacity: 0, y: 16, filter: 'blur(6px)' }}
                 animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                 transition={{ duration: 0.85, ease: 'easeOut' }}
-                className="text-3xl sm:text-5xl font-bold tracking-tight text-amber-400 drop-shadow"
+                className="text-5xl sm:text-5xl font-bold tracking-tight text-amber-400 drop-shadow"
               >
                 Capture your creative shot
               </motion.h1>
@@ -197,25 +195,23 @@ export default function HomePage() {
                 initial={{ opacity: 0, y: 16, filter: 'blur(6px)' }}
                 animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                 transition={{ duration: 0.9, delay: 0.12, ease: 'easeOut' }}
-                className="mt-3 text-lg sm:text-2xl text-green-400"
+                className="mt-3 text-2xl sm:text-2xl text-green-400"
               >
                 And store forever for everyone
               </motion.h2>
             </>
           ) : (
             <>
-              <h1 className="text-3xl sm:text-5xl font-bold tracking-tight text-white drop-shadow">
+              <h1 className="text-5xl sm:text-5xl font-bold tracking-tight text-white drop-shadow">
                 Capture your creative shot
               </h1>
-              <h2 className="mt-3 text-lg sm:text-2xl text-green-400">
+              <h2 className="mt-3 text-xl sm:text-2xl text-green-400">
                 And store forever for everyone
               </h2>
             </>
           )}
 
-          <p className="mt-4 text-m text-orange-400">
-            Shutter Sphere — photo sharing & storytelling.
-          </p>
+            
         </div>
 
         {/* MIDDLE VISUAL */}

@@ -39,8 +39,9 @@ const schema = new mongoose.Schema({
     weblink:{
         type:String,
         default:""
-    }
-
+    },
+    avatarUrl:String,
+    coverUrl: String
 });
 
 schema.pre('save', async function() {

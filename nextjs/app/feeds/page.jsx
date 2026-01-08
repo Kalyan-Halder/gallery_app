@@ -16,6 +16,7 @@ const Feeds = () => {
       console.log(toggle)
       setToggle(!toggle)
   }
+  
 
   useEffect(() => {
     // Simulate API call
@@ -146,6 +147,7 @@ const Feeds = () => {
           </div>
         </div>
         {toggle && (<Add_Post open={toggle} onClose={toggle_button} token={user_token} />)}
+        
         {/* Filter Tabs */}
         <div className="flex space-x-2 mb-6 overflow-x-auto">
           {filters.map((filter) => (
