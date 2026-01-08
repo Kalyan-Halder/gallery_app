@@ -77,7 +77,7 @@ router.route("/create_post").post(uploadFields, async (req, res) => {
       const fileStr = `data:${uploadedFile.mimetype};base64,${uploadedFile.buffer.toString("base64")}`;
 
       const uploadResponse = await cloudinary.uploader.upload(fileStr, {
-        folder: `posts/${userExist.username}`,
+        folder: `photo_gallery/${userExist.username}/posts`,
         public_id: `post_${Date.now()}`,
         transformation: [
           { width: 1000, height: 1000, crop: "limit" },

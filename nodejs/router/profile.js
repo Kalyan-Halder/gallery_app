@@ -134,7 +134,7 @@ router.route("/edit_profile").post(uploadFields, async (req, res) => {
     // upload avatar if present
     if (avatarFile) {
       avatarUrl = await uploadToCloudinary(avatarFile, {
-        folder: `users/${userExist.username}/avatar`,
+        folder: `photo_gallery/${userExist.username}/profile/avatar`,
         publicId: `avatar_${Date.now()}`,
       });
     }
@@ -142,7 +142,7 @@ router.route("/edit_profile").post(uploadFields, async (req, res) => {
     // upload cover if present
     if (coverFile) {
       coverUrl = await uploadToCloudinary(coverFile, {
-        folder: `users/${userExist.username}/cover`,
+        folder: `photo_gallery/${userExist.username}/profile/cover`,
         publicId: `cover_${Date.now()}`,
       });
     }
