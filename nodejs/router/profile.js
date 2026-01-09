@@ -166,4 +166,26 @@ router.route("/edit_profile").post(uploadFields, async (req, res) => {
 });
 
 
+router.route("/delete_post").post(async (req,res)=>{
+  try{
+    
+    const {post_id} = req.body;
+    const post = await posts.findOne({_id:post_id})
+    if(!post){
+      return res.status(400).json({message:"Post Does Not Exist"})
+    }else{
+      const user_id = post.user_id;
+      
+      //delete the post
+      const userExist = await user.findOne({_id:user_id})
+      await user.findOneAndUpdate({_id:user_id}, {posts: userExist.posts-1})
+      await posts.findOneAndDelete({_id:post_id})
+    }
+    console.log(post) 
+  }catch(err){
+    console.log(err)
+  }
+})
+
+
 module.exports = router

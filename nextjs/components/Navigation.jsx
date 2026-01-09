@@ -10,9 +10,9 @@ const Navigation = () => {
   const router = useRouter();
   const navItems = [
     { name: "Feeds", href: "/feeds", icon: "📰" },
-    { name: "Profile", href: "/profile", icon: "👤" },
     { name: "Contacts", href: "/contacts", icon: "📞" },
     { name: "About", href: "/about", icon: "ℹ️" },
+    { name: "Profile", href: "/profile", icon: "👤" },
   ]
   const Logout = ()=>{
     console.log("Clicked")
@@ -23,7 +23,7 @@ const Navigation = () => {
         }, 100);
   }
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-gray-100 bg-white backdrop-blur-md ">
+    <header className="sticky top-0 z-50 w-full border-b border-gray-100 bg-white backdrop-blur-md">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           

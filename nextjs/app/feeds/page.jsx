@@ -11,7 +11,7 @@ const Feeds = () => {
   const [savedPosts, setSavedPosts] = useState(new Set());
 
   const [toggle, setToggle] = useState(false)
-  const [user_token, setToken] = useState(false)
+  const [user_token, setToken] = useState("")
   const toggle_button = ()=>{
       console.log(toggle)
       setToggle(!toggle)
@@ -20,11 +20,13 @@ const Feeds = () => {
 
   useEffect(() => {
     // Simulate API call
-    const fetchData = async () => {
+      const fetchData = async () => {
+      const token = localStorage.getItem("token");
       try{
          const response = await fetch("http://localhost:8000/all_post", {
-            method: "GET",
-            headers: { "Content-Type": "application/json" }
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body:JSON.stringify({"token": token} )
           });
 
           const result = await response.json();
@@ -41,8 +43,9 @@ const Feeds = () => {
              setPosts(fetchedPosts);
              setLoading(false);
           }
-          const token = localStorage.getItem("token");
+          
           setToken(token)
+        
           
           
       } catch(err) {
@@ -80,6 +83,7 @@ const Feeds = () => {
   };
 
   const handleSave = (postId) => {
+    console.log(postId)
     const newSaved = new Set(savedPosts);
     if (newSaved.has(postId)) {
       newSaved.delete(postId);
@@ -177,8 +181,9 @@ const Feeds = () => {
                 <div className="p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                      <div className={`h-10 w-10 rounded-full bg-gradient-to-r ${post.user?.color || "from-gray-500 to-gray-700"} flex items-center justify-center text-white font-semibold`}>
-                        {post.user?.avatar || "UU"}
+                      <div
+                         className={`h-10 w-10 rounded-full bg-linear-to-r ${ post.user?.color || "from-gray-500 to-gray-700" } flex items-center justify-center text-white font-semibold bg-center bg-cover`}
+                         style={post.user?.avatarUrl ? { backgroundImage: `url(${post.user.avatarUrl})` } : undefined }> {!post.user?.avatarUrl && (post.user?.avatar || "UU")}
                       </div>
                       <div>
                         <div className="font-semibold text-gray-900">{post.user?.name || "Unknown User"}</div>
@@ -204,8 +209,7 @@ const Feeds = () => {
                   />
                   <button 
                     onClick={() => handleSave(post.id || post._id)}
-                    className="absolute top-4 right-4 p-2 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white"
-                  >
+                    className="absolute top-4 right-4 p-2 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white">
                     <Bookmark className={`h-5 w-5 ${savedPosts.has(post.id || post._id) ? 'text-yellow-500 fill-yellow-500' : 'text-gray-700'}`} />
                   </button>
                 </div>
@@ -258,13 +262,16 @@ const Feeds = () => {
                   {/* Comment Input */}
                   <div className="flex items-center space-x-3">
                     <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
-                      <span className="text-xs text-gray-600">Y</span>
+                      <span
+                        className="inline-block h-10 w-10 rounded-full bg-center bg-cover"
+                        style={{ backgroundImage: `url(${post.watcher_avatar})` }}
+                      />
                     </div>
                     <div className="flex-1 relative">
                       <input
                         type="text"
                         placeholder="Add a comment..."
-                        className="w-full px-4 py-2 bg-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-4 py-2 bg-gray-100 text-black rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                       <button className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1">
                         <Send className="h-4 w-4 text-gray-500" />
@@ -293,7 +300,7 @@ const Feeds = () => {
       </div>
 
       {/* Floating Action Button for Mobile */}
-      <button className="fixed bottom-6 right-6 md:hidden p-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full shadow-lg hover:shadow-xl transition-shadow">
+      <button className="fixed bottom-6 right-6 md:hidden p-4 bg-linear-to-r from-blue-500 to-purple-500 text-white rounded-full shadow-lg hover:shadow-xl transition-shadow">
         <Camera className="h-6 w-6" />
       </button>
 
@@ -309,7 +316,7 @@ const Feeds = () => {
             ].map((user, index) => (
               <div key={index} className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <div className={`h-10 w-10 rounded-full bg-gradient-to-r ${user.color}`} />
+                  <div className={`h-10 w-10 rounded-full bg-linear-to-r ${user.color}`} />
                   <div>
                     <div className="font-medium text-gray-900">{user.name}</div>
                     <div className="text-sm text-gray-500">{user.followers} followers</div>

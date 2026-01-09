@@ -3,14 +3,16 @@ import Add_Post from "./add_post"
 import Edit_Profile_Photos from "./edit_profile";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { Plus, Camera, Heart, MessageCircle, Share2, MoreVertical, Edit, Settings, LogOut, Grid, Bookmark, UserPlus, Users, MapPin, Calendar, Link as LinkIcon, MessageCirclePlus } from "lucide-react";
+import {Trash, Plus, Camera, Heart, MessageCircle, Share2, MoreVertical, Edit, Settings, LogOut, Grid, Bookmark, UserPlus, Users, MapPin, Calendar, Link as LinkIcon, MessageCirclePlus } from "lucide-react";
 import { useRouter } from "next/navigation";
+ 
 const Profile = () => {
   const [activeTab, setActiveTab] = useState("posts");
   const [isFollowing, setIsFollowing] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [user_token, setToken] = useState(false)
   const [posts, setPosts] = useState([])
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null)
   const router = useRouter()
   
   const [edit_toggle, setEditToggle] = useState(false)
@@ -44,7 +46,20 @@ const Profile = () => {
     avatarUrl:""
   });
 
- 
+  const deletePost = async (postId) => {
+    console.log(postId);
+    try{
+      const response = await fetch("http://localhost:8000/delete_post", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({post_id:postId}),
+      });
+    }catch(err){
+      console.log(err)
+    }
+  };
 
   useEffect(() => {
   const fetchData = async () => {
@@ -186,14 +201,14 @@ const Profile = () => {
                       <button className="p-2 border border-gray-300 rounded-full hover:bg-gray-50 transition-colors">
                         <MessageCircle className="h-5 w-5 text-gray-700" />
                       </button>
+                      <button onClick={toggle_button} className="p-2 border border-gray-300 rounded-full hover:pointer transition-colors hover:bg-blue-300">
+                        <Plus className="h-5 w-5 text-gray-700" />
+                      </button>
                       <div className="relative">
                         <button className="p-2 border border-gray-300 rounded-full hover:bg-gray-50 transition-colors">
                           <MoreVertical className="h-5 w-5 text-gray-700" />
                         </button>
                       </div>
-                      <button onClick={toggle_button} className="p-2 border border-gray-300 rounded-full hover:pointer transition-colors hover:bg-blue-300">
-                        <Plus className="h-5 w-5 text-gray-700" />
-                      </button>
                     </div>
                   </div>
 
@@ -289,9 +304,57 @@ const Profile = () => {
                           <span className="font-semibold">{post.comments}</span>
                         </div>
                       </div>
-                      <button className="p-2 bg-white/20 backdrop-blur-sm rounded-full hover:bg-white/30">
-                        <Share2 className="h-5 w-5" />
-                      </button>
+                      <div>
+                        <div className="relative inline-block">
+                          <button
+                            className="p-2 bg-white/20 backdrop-blur-sm rounded-full hover:bg-red-600 m-1"
+                            onClick={() => setConfirmDeleteId(post._id)}
+                          >
+                            <Trash />
+                          </button>
+
+                          {confirmDeleteId === post._id && (
+                            <div className="fixed inset-0 z-9999 flex items-center justify-center">
+                      
+                              <div
+                                className="absolute inset-0 bg-black/40"
+                                onClick={() => setConfirmDeleteId(null)}
+                              />
+
+                              
+                              <div className="relative z-10 w-[90%] max-w-sm rounded-xl bg-white shadow-lg border border-gray-200 p-4">
+                                <p className="text-sm text-gray-800 mb-4">
+                                  Delete this post? This can’t be undone.
+                                </p>
+
+                                <div className="flex justify-end gap-2">
+                                  <button
+                                    className="px-3 py-1.5 text-sm text-black rounded-md bg-gray-100 hover:bg-gray-200"
+                                    onClick={() => setConfirmDeleteId(null)}
+                                  >
+                                    Cancel
+                                  </button>
+
+                                  <button
+                                    className="px-3 py-1.5 text-sm rounded-md bg-red-600 text-white hover:bg-red-700"
+                                    onClick={() => {
+                                      deletePost(post._id);
+                                      setConfirmDeleteId(null);
+                                    }}
+                                  >
+                                    Delete
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+
+                        <button className="p-2 bg-white/20 backdrop-blur-sm rounded-full hover:bg-blue-500 m-1">
+                          <Share2 className="h-5 w-5" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>

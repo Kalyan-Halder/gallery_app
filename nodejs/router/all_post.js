@@ -3,9 +3,9 @@ const router = express.Router()
 const user = require("../utils/user_schema");
 const posts = require("../utils/post_schema")
 
-router.route("/all_post").get(async (req, res) => {
+router.route("/all_post").post(async (req, res) => {
     try {
-       
+        console.log(req.body)
         const allPosts = await posts.find({})
             .sort({ created_at: -1 })
             .lean();
@@ -17,13 +17,17 @@ router.route("/all_post").get(async (req, res) => {
                 posts: []
             });
         }
+
+        //find the user who is watching the feed:
+        const watching_user = await user.findOne({token:req.body.token})
+        console.log(watching_user)
         
        
         const userIds = [...new Set(allPosts.map(post => post.user_id))];
         
         // Fetch all users who have posts - select the correct fields
         const users = await user.find({ _id: { $in: userIds } })
-            .select('first_name last_name username avatar color')
+            .select('first_name last_name username avatar color avatarUrl')
             .lean();
         
         // Create a map for quick user lookup
@@ -116,11 +120,13 @@ router.route("/all_post").get(async (req, res) => {
             
             return {
                 id: post._id,
+                watcher_avatar: watching_user.avatarUrl,
                 user: {
                     name: displayName,
                     username: username,
                     avatar: avatar,
-                    color: color
+                    color: color,
+                    avatarUrl: userData.avatarUrl
                 },
                 image: post.url || "",
                 caption: post.description || "",

@@ -100,7 +100,10 @@ router.route("/create_post").post(uploadFields, async (req, res) => {
       url: imageUrl,               
       created_at: new Date(),
     });
-
+    
+    //update the post count for the user and save 
+    const updateUser = await user.findOneAndUpdate({_id:userExist._id}, {posts: userExist.posts+1})
+    await updateUser.save()
     await newPost.save();
 
     return res.status(201).json({

@@ -173,7 +173,7 @@ export default function HomePage() {
   useEffect(() => setMounted(true), []);
 
   return (
-    <div className="relative w-screen h-screen overflow-hidden bg-[url('/bg1.jpg')] bg-cover bg-center pt-18">
+    <div className="relative w-screen h-screen overflow-hidden bg-[url('/bg1.jpg')] bg-cover bg-center">
       <div className="absolute inset-0 bg-linear-to-b from-black/55 via-black/40 to-black/70" />
       <div className="absolute inset-0 [box-shadow:inset_0_0_160px_rgba(0,0,0,0.75)]" />
 
