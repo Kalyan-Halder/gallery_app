@@ -115,6 +115,7 @@ const Profile = () => {
       }));
 
       try {
+        const BaseUrl = process.env.NEXT_PUBLIC_BASE_URL
         const res = await fetch(`${BaseUrl}/delete_post`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
