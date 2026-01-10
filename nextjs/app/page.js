@@ -5,14 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 
-const PHOTOS = [
-  '/home5.jpg',
-  '/home3.jpg',
-  '/home4.jpg',
-  '/home2.jpg',
-  '/home1.jpg',
-   
-];
+const PHOTOS = ['/home5.jpg', '/home3.jpg', '/home4.jpg', '/home2.jpg', '/home1.jpg'];
 
 const CTA_CLASS =
   'inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm sm:text-base font-semibold bg-white text-black hover:bg-white/90 active:scale-[0.99] shadow-[0_18px_45px_rgba(0,0,0,0.45)] transition';
@@ -65,7 +58,6 @@ function AnimatedBurst({ onDone, spreadDone }) {
     const RADIUS = 240;
     const Y_SQUASH = 0.88;
 
-   
     const START_ANGLE = -Math.PI / 2;
 
     return Array.from({ length: count }).map((_, i) => {
@@ -110,7 +102,6 @@ function AnimatedBurst({ onDone, spreadDone }) {
                 : {
                     x: [0, c.x],
                     y: [0, c.y],
-                    // slower spin
                     rotate: [0, 240 + c.finalRotate],
                     scale: [0.78, 1],
                     opacity: [0, 1],
@@ -129,10 +120,9 @@ function AnimatedBurst({ onDone, spreadDone }) {
               if (!spreadDone && i === lastIndex) onDone();
             }}
           >
-           
             <motion.div
               className="origin-center"
-              style={{ transformOrigin: '50% 50%' }} 
+              style={{ transformOrigin: '50% 50%' }}
               animate={
                 spreadDone
                   ? {
@@ -164,9 +154,22 @@ function AnimatedBurst({ onDone, spreadDone }) {
 export default function HomePage() {
   const [mounted, setMounted] = useState(false);
   const [spreadDone, setSpreadDone] = useState(false);
+  const [hasToken, setHasToken] = useState(false);
 
+  useEffect(() => {
+    setMounted(true);
 
-  useEffect(() => setMounted(true), []);
+    // Check localStorage token (client-side only)
+    try {
+      const token = window.localStorage.getItem('token');
+      setHasToken(Boolean(token));
+    } catch {
+      setHasToken(false);
+    }
+  }, []);
+
+  const ctaHref = hasToken ? '/feeds' : '/signin';
+  const ctaText = hasToken ? 'Explore' : 'Go to Login';
 
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-[url('/bg1.jpg')] bg-cover bg-center">
@@ -175,7 +178,6 @@ export default function HomePage() {
 
       {/* layout */}
       <div className="relative z-10 h-full w-full flex flex-col items-center">
-       
         <div className="w-full max-w-6xl px-6 pt-10 sm:pt-14 text-center select-none relative z-30">
           {mounted ? (
             <>
@@ -206,11 +208,8 @@ export default function HomePage() {
               </h2>
             </>
           )}
-
-            
         </div>
 
-       
         <div className="flex-1 w-full flex items-center justify-center px-6 relative z-20">
           {mounted ? (
             <AnimatedBurst onDone={() => setSpreadDone(true)} spreadDone={spreadDone} />
@@ -219,7 +218,6 @@ export default function HomePage() {
           )}
         </div>
 
-       
         <div className="w-full px-6 pb-10 sm:pb-12 flex justify-center relative z-30">
           {mounted ? (
             <motion.div
@@ -231,14 +229,13 @@ export default function HomePage() {
               }
               transition={{ duration: 0.55, ease: 'easeOut' }}
             >
-              <Link href="/signin" className={CTA_CLASS}>
-                Go to Login <span aria-hidden>→</span>
+              <Link href={ctaHref} className={CTA_CLASS}>
+                {ctaText} <span aria-hidden>→</span>
               </Link>
             </motion.div>
           ) : (
-            
             <div className="opacity-0 absolute">
-              <Link href="/login" className={CTA_CLASS}>
+              <Link href="/signin" className={CTA_CLASS}>
                 Go to Login <span aria-hidden>→</span>
               </Link>
             </div>

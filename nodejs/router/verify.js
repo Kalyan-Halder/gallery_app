@@ -8,6 +8,7 @@ router.route("/verify").post(async (req, res) => {
     try {
          var { email, otp , password , conpassword } = req.body;
         // Find user by email
+        console.log(req.body)
         const userExist = await user.findOne({ email: email });
         
         if (!userExist) {

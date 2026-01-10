@@ -113,7 +113,7 @@ const Feeds = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="h-full bg-gray-200">
        
 
       {/* Main Content */}

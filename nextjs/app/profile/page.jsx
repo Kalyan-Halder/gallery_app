@@ -1,23 +1,42 @@
 "use client";
-import Add_Post from "./add_post"
+import Add_Post from "./add_post";
 import Edit_Profile_Photos from "./edit_profile";
 import Image from "next/image";
 import { useState, useEffect, useCallback } from "react"; // Added useCallback
-import {Trash, Plus, Camera, Heart, MessageCircle, Share2, MoreVertical, Edit, Settings, LogOut, Grid, Bookmark, UserPlus, Users, MapPin, Calendar, Link as LinkIcon, MessageCirclePlus } from "lucide-react";
+import {
+  Trash,
+  Plus,
+  Camera,
+  Heart,
+  MessageCircle,
+  Share2,
+  MoreVertical,
+  Edit,
+  Settings,
+  LogOut,
+  Grid,
+  Bookmark,
+  UserPlus,
+  Users,
+  MapPin,
+  Calendar,
+  Link as LinkIcon,
+  MessageCirclePlus,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
- 
+
 const Profile = () => {
   const [activeTab, setActiveTab] = useState("posts");
   const [isFollowing, setIsFollowing] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [user_token, setToken] = useState(false)
-  const [posts, setPosts] = useState([])
-  const [confirmDeleteId, setConfirmDeleteId] = useState(null)
-  const router = useRouter()
-  
-  const [edit_toggle, setEditToggle] = useState(false)
-  const [toggle, setToggle] = useState(false)
-  
+  const [user_token, setToken] = useState(false);
+  const [posts, setPosts] = useState([]);
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
+  const router = useRouter();
+
+  const [edit_toggle, setEditToggle] = useState(false);
+  const [toggle, setToggle] = useState(false);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [data, setData] = useState(null);
@@ -32,19 +51,19 @@ const Profile = () => {
     followers: "",
     following: "",
     posts: "",
-    initial:"",
-    coverUrl:"",
-    avatarUrl:""
+    initial: "",
+    coverUrl: "",
+    avatarUrl: "",
   });
 
   // Create a fetchData function that can be called multiple times
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const BaseUrl = process.env.NEXT_PUBLIC_BASE_URL
+      const BaseUrl = process.env.NEXT_PUBLIC_BASE_URL;
       const token = localStorage.getItem("token");
       setToken(token);
-      
+
       // Fetch profile data
       const response = await fetch(`${BaseUrl}/profile`, {
         method: "POST",
@@ -65,7 +84,8 @@ const Profile = () => {
       if (!response.ok || !postsResponse.ok) {
         throw new Error(result?.message || `Error: ${response.status}`);
       } else {
-        const initials = (result.first_name?.[0] ?? "") + (result.last_name?.[0] ?? "");
+        const initials =
+          (result.first_name?.[0] ?? "") + (result.last_name?.[0] ?? "");
         setProfileData({
           name: `${result.first_name} ${result.last_name}`,
           username: `@${result.username}`,
@@ -78,7 +98,7 @@ const Profile = () => {
           joinDate: `Joined ${result.dateStr}`,
           initial: initials,
           coverUrl: result.coverUrl,
-          avatarUrl: result.avatarUrl
+          avatarUrl: result.avatarUrl,
         });
 
         setPosts(postsData.post || []);
@@ -105,34 +125,32 @@ const Profile = () => {
   };
 
   const deletePost = async (postId) => {
-      const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token");
 
-      // optimistic UI remove (string-safe)
-      setPosts(prev => prev.filter(p => String(p._id) !== String(postId)));
-      setProfileData(prev => ({
-        ...prev,
-        posts: Math.max(0, Number(prev.posts || 0) - 1),
-      }));
+    // optimistic UI remove (string-safe)
+    setPosts((prev) => prev.filter((p) => String(p._id) !== String(postId)));
+    setProfileData((prev) => ({
+      ...prev,
+      posts: Math.max(0, Number(prev.posts || 0) - 1),
+    }));
 
-      try {
-        const BaseUrl = process.env.NEXT_PUBLIC_BASE_URL
-        const res = await fetch(`${BaseUrl}/delete_post`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ token, post_id: postId }),
-          cache: "no-store",
-        });
+    try {
+      const BaseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+      const res = await fetch(`${BaseUrl}/delete_post`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token, post_id: postId }),
+        cache: "no-store",
+      });
 
-        const data = await res.json().catch(() => ({}));
-        if (!res.ok) throw new Error(data?.message || "Failed to delete post");
-  
-      } catch (e) {
-        console.error(e);
-        // rollback by refetching everything if delete failed
-        fetchData();
-      }
-   };
-
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data?.message || "Failed to delete post");
+    } catch (e) {
+      console.error(e);
+      // rollback by refetching everything if delete failed
+      fetchData();
+    }
+  };
 
   // Callback function to refresh data after adding a post
   const handlePostAdded = () => {
@@ -145,21 +163,45 @@ const Profile = () => {
   };
 
   const savedPosts = [
-    { id: 7, likes: 567, comments: 42, image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4" },
-    { id: 8, likes: 389, comments: 27, image: "https://images.unsplash.com/photo-1518837695005-2083093ee35b" },
+    {
+      id: 7,
+      likes: 567,
+      comments: 42,
+      image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4",
+    },
+    {
+      id: 8,
+      likes: 389,
+      comments: 27,
+      image: "https://images.unsplash.com/photo-1518837695005-2083093ee35b",
+    },
   ];
 
   const likedPosts = [
-    { id: 9, likes: 654, comments: 56, image: "https://images.unsplash.com/photo-1493246507139-91e8fad9978e" },
-    { id: 10, likes: 432, comments: 38, image: "https://images.unsplash.com/photo-1519681393784-d120267933ba" },
+    {
+      id: 9,
+      likes: 654,
+      comments: 56,
+      image: "https://images.unsplash.com/photo-1493246507139-91e8fad9978e",
+    },
+    {
+      id: 10,
+      likes: 432,
+      comments: 38,
+      image: "https://images.unsplash.com/photo-1519681393784-d120267933ba",
+    },
   ];
 
   const renderPosts = () => {
-    switch(activeTab) {
-      case "posts": return posts;
-      case "saved": return savedPosts;
-      case "liked": return likedPosts;
-      default: return posts;
+    switch (activeTab) {
+      case "posts":
+        return posts;
+      case "saved":
+        return savedPosts;
+      case "liked":
+        return likedPosts;
+      default:
+        return posts;
     }
   };
 
@@ -168,11 +210,14 @@ const Profile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="h-auto bg-gray-200">
       {/* Cover Photo */}
       <div className="relative h-64 md:h-80 bg-linear-to-r from-blue-600 via-purple-600 to-pink-600">
         <div className="absolute inset-0 bg-black/30">
-          <div className="h-full w-full bg-cover bg-center transition-transform duration-500 group-hover:scale-110" style={{ backgroundImage: `url(${profileData.coverUrl})` }}/>
+          <div
+            className="h-full w-full bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
+            style={{ backgroundImage: `url(${profileData.coverUrl})` }}
+          />
         </div>
       </div>
 
@@ -193,12 +238,17 @@ const Profile = () => {
                       ) : (
                         <div
                           className="h-full w-full bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
-                          style={{ backgroundImage: `url(${profileData.avatarUrl})` }}
+                          style={{
+                            backgroundImage: `url(${profileData.avatarUrl})`,
+                          }}
                         />
                       )}
                     </div>
                   </div>
-                  <button className="absolute bottom-2 right-2 p-2 bg-white rounded-full shadow-md hover:shadow-lg transition-shadow" onClick={edit_toggle_button}>
+                  <button
+                    className="absolute bottom-2 right-2 p-2 bg-white rounded-full shadow-md hover:shadow-lg transition-shadow"
+                    onClick={edit_toggle_button}
+                  >
                     <Edit className="h-4 w-4 text-gray-700" />
                   </button>
                 </div>
@@ -207,25 +257,32 @@ const Profile = () => {
                 <div className="flex-1">
                   <div className="flex flex-col md:flex-row md:items-center justify-between mb-4">
                     <div>
-                      <h1 className="text-3xl font-bold text-gray-900">{profileData.name}</h1>
-                      <p className="text-gray-600 mt-1">{profileData.username}</p>
+                      <h1 className="text-3xl font-bold text-gray-900">
+                        {profileData.name}
+                      </h1>
+                      <p className="text-gray-600 mt-1">
+                        {profileData.username}
+                      </p>
                     </div>
                     <div className="flex space-x-3 mt-4 md:mt-0">
-                      <button 
+                      <button
                         onClick={handleFollow}
                         className={`px-6 py-2 rounded-full font-semibold transition-all ${
-                          isFollowing 
-                            ? 'bg-gray-100 text-gray-900 hover:bg-gray-200' 
-                            : 'bg-linear-to-r from-blue-500 to-purple-500 text-white hover:opacity-90'
+                          isFollowing
+                            ? "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                            : "bg-linear-to-r from-blue-500 to-purple-500 text-white hover:opacity-90"
                         }`}
                       >
-                        {isFollowing ? 'Following' : 'Follow'}
+                        {isFollowing ? "Following" : "Follow"}
                       </button>
-                      
+
                       <button className="p-2 border border-gray-300 rounded-full hover:bg-gray-50 transition-colors">
                         <MessageCircle className="h-5 w-5 text-gray-700" />
                       </button>
-                      <button onClick={toggle_button} className="p-2 border border-gray-300 rounded-full hover:pointer transition-colors hover:bg-blue-300">
+                      <button
+                        onClick={toggle_button}
+                        className="p-2 border border-gray-300 rounded-full hover:pointer transition-colors hover:bg-blue-300"
+                      >
                         <Plus className="h-5 w-5 text-gray-700" />
                       </button>
                       <div className="relative">
@@ -239,7 +296,7 @@ const Profile = () => {
                   {/* Bio and Info */}
                   <div className="space-y-3">
                     <p className="text-gray-700">{profileData.bio}</p>
-                    
+
                     <div className="flex flex-wrap gap-4 text-sm text-gray-600">
                       <div className="flex items-center space-x-1">
                         <MapPin className="h-4 w-4" />
@@ -247,7 +304,12 @@ const Profile = () => {
                       </div>
                       <div className="flex items-center space-x-1">
                         <LinkIcon className="h-4 w-4" />
-                        <a href={profileData.website} className="text-blue-600 hover:underline">{profileData.website}</a>
+                        <a
+                          href={profileData.website}
+                          className="text-blue-600 hover:underline"
+                        >
+                          {profileData.website}
+                        </a>
                       </div>
                       <div className="flex items-center space-x-1">
                         <Calendar className="h-4 w-4" />
@@ -258,15 +320,21 @@ const Profile = () => {
                     {/* Stats */}
                     <div className="flex space-x-6 pt-2">
                       <div className="text-center">
-                        <div className="text-2xl font-bold text-gray-900">{profileData.posts}</div>
+                        <div className="text-2xl font-bold text-gray-900">
+                          {profileData.posts}
+                        </div>
                         <div className="text-sm text-gray-600">Posts</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-2xl font-bold text-gray-900">{profileData.followers}</div>
+                        <div className="text-2xl font-bold text-gray-900">
+                          {profileData.followers}
+                        </div>
                         <div className="text-sm text-gray-600">Followers</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-2xl font-bold text-gray-900">{profileData.following}</div>
+                        <div className="text-2xl font-bold text-gray-900">
+                          {profileData.following}
+                        </div>
                         <div className="text-sm text-gray-600">Following</div>
                       </div>
                     </div>
@@ -280,10 +348,26 @@ const Profile = () => {
           <div className="border-t border-gray-200">
             <nav className="flex overflow-x-auto">
               {[
-                { id: "posts", icon: <Grid className="h-5 w-5" />, label: "Posts" },
-                { id: "saved", icon: <Bookmark className="h-5 w-5" />, label: "Saved" },
-                { id: "liked", icon: <Heart className="h-5 w-5" />, label: "Liked" },
-                { id: "tagged", icon: <Users className="h-5 w-5" />, label: "Tagged" }
+                {
+                  id: "posts",
+                  icon: <Grid className="h-5 w-5" />,
+                  label: "Posts",
+                },
+                {
+                  id: "saved",
+                  icon: <Bookmark className="h-5 w-5" />,
+                  label: "Saved",
+                },
+                {
+                  id: "liked",
+                  icon: <Heart className="h-5 w-5" />,
+                  label: "Liked",
+                },
+                {
+                  id: "tagged",
+                  icon: <Users className="h-5 w-5" />,
+                  label: "Tagged",
+                },
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -307,12 +391,15 @@ const Profile = () => {
           {renderPosts().length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {renderPosts().map((post) => (
-                <div key={post._id} className="group relative aspect-square rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300">
-                  <div 
+                <div
+                  key={post._id}
+                  className="group relative aspect-square rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300"
+                >
+                  <div
                     className="h-full w-full bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
                     style={{ backgroundImage: `url(${post.url})` }}
                   />
-                  <div className="absolute inset-0 bg-linear-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div className="absolute inset-0 bg-linear-to-t from-black/70 via-transparent to-transparent group-hover:opacity-100 transition-opacity duration-300">
                     <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-white">
                       <div className="flex items-center space-x-4">
                         <div className="flex items-center space-x-1">
@@ -339,7 +426,7 @@ const Profile = () => {
                                 className="absolute inset-0 bg-black/40"
                                 onClick={() => setConfirmDeleteId(null)}
                               />
-                              
+
                               <div className="relative z-10 w-[90%] max-w-sm rounded-xl bg-white shadow-lg border border-gray-200 p-4">
                                 <p className="text-sm text-gray-800 mb-4">
                                   Delete this post? This can't be undone.
@@ -382,9 +469,11 @@ const Profile = () => {
               <div className="mx-auto w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
                 <Grid className="h-12 w-12 text-gray-400" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">No Posts Yet</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                No Posts Yet
+              </h3>
               <p className="text-gray-600 max-w-sm mx-auto">
-                {activeTab === "posts" 
+                {activeTab === "posts"
                   ? "Share your first photo and start your visual journey!"
                   : activeTab === "saved"
                   ? "Posts you save will appear here"
@@ -396,24 +485,41 @@ const Profile = () => {
 
         {/* Suggested Profiles */}
         <div className="mt-12 bg-white rounded-2xl shadow-xl p-6">
-          <h3 className="text-xl font-bold text-gray-900 mb-6">Suggested Creators</h3>
+          <h3 className="text-xl font-bold text-gray-900 mb-6">
+            Suggested Creators
+          </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { name: "Sarah Miller", username: "@sarahshots", followers: "8.2K" },
+              {
+                name: "Sarah Miller",
+                username: "@sarahshots",
+                followers: "8.2K",
+              },
               { name: "Mike Chen", username: "@mikewide", followers: "15.4K" },
               { name: "Lisa Park", username: "@lisalens", followers: "6.7K" },
-              { name: "David Wilson", username: "@davidframe", followers: "21.3K" }
+              {
+                name: "David Wilson",
+                username: "@davidframe",
+                followers: "21.3K",
+              },
             ].map((creator, index) => (
-              <div key={index} className="border border-gray-200 rounded-xl p-4 hover:border-blue-300 transition-colors">
+              <div
+                key={index}
+                className="border border-gray-200 rounded-xl p-4 hover:border-blue-300 transition-colors"
+              >
                 <div className="flex items-center space-x-3 mb-3">
                   <div className="h-12 w-12 rounded-full bg-linear-to-br from-blue-400 to-purple-500" />
                   <div className="flex-1">
-                    <h4 className="font-semibold text-gray-900">{creator.name}</h4>
+                    <h4 className="font-semibold text-gray-900">
+                      {creator.name}
+                    </h4>
                     <p className="text-sm text-gray-600">{creator.username}</p>
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">{creator.followers} followers</span>
+                  <span className="text-sm text-gray-600">
+                    {creator.followers} followers
+                  </span>
                   <button className="text-sm font-medium text-blue-600 hover:text-blue-700">
                     Follow
                   </button>
@@ -426,18 +532,18 @@ const Profile = () => {
 
       {/* Modals - Add these at the end of the return statement */}
       {toggle && (
-        <Add_Post 
-          open={toggle} 
-          onClose={toggle_button} 
-          token={user_token} 
+        <Add_Post
+          open={toggle}
+          onClose={toggle_button}
+          token={user_token}
           onSuccess={handlePostAdded} // Add this prop
         />
       )}
       {edit_toggle && (
-        <Edit_Profile_Photos 
-          open={edit_toggle} 
-          onClose={edit_toggle_button} 
-          token={user_token} 
+        <Edit_Profile_Photos
+          open={edit_toggle}
+          onClose={edit_toggle_button}
+          token={user_token}
           onSuccess={handleProfileUpdated} // Add this prop
         />
       )}
@@ -446,7 +552,9 @@ const Profile = () => {
       {isEditing && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-2xl max-w-md w-full p-6">
-            <h3 className="text-xl font-bold text-gray-900 mb-4">Edit Profile</h3>
+            <h3 className="text-xl font-bold text-gray-900 mb-4">
+              Edit Profile
+            </h3>
             {/* Add edit form here */}
           </div>
         </div>
@@ -454,16 +562,34 @@ const Profile = () => {
 
       {/* Bottom Navigation */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-3 px-4 flex justify-around md:hidden">
-        <button className={`p-3 rounded-full ${activeTab === "posts" ? "text-blue-600 bg-blue-50" : "text-gray-600"}`}>
+        <button
+          className={`p-3 rounded-full ${
+            activeTab === "posts" ? "text-blue-600 bg-blue-50" : "text-gray-600"
+          }`}
+        >
           <Grid className="h-6 w-6" />
         </button>
-        <button className={`p-3 rounded-full ${activeTab === "saved" ? "text-blue-600 bg-blue-50" : "text-gray-600"}`}>
+        <button
+          className={`p-3 rounded-full ${
+            activeTab === "saved" ? "text-blue-600 bg-blue-50" : "text-gray-600"
+          }`}
+        >
           <Bookmark className="h-6 w-6" />
         </button>
-        <button className={`p-3 rounded-full ${activeTab === "liked" ? "text-blue-600 bg-blue-50" : "text-gray-600"}`}>
+        <button
+          className={`p-3 rounded-full ${
+            activeTab === "liked" ? "text-blue-600 bg-blue-50" : "text-gray-600"
+          }`}
+        >
           <Heart className="h-6 w-6" />
         </button>
-        <button className={`p-3 rounded-full ${activeTab === "tagged" ? "text-blue-600 bg-blue-50" : "text-gray-600"}`}>
+        <button
+          className={`p-3 rounded-full ${
+            activeTab === "tagged"
+              ? "text-blue-600 bg-blue-50"
+              : "text-gray-600"
+          }`}
+        >
           <Users className="h-6 w-6" />
         </button>
       </div>

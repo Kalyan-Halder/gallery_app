@@ -12,7 +12,7 @@ const email_address = process.env.EMAIL
 router.route("/reset").post(async (req, res) => {
     try {
         const { email} = req.body;
-        
+        console.log(req.body)
 
         // Find user by email
         const userExist = await user.findOne({ email: email });

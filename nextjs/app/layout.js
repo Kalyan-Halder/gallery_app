@@ -21,7 +21,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col overflow-x-hidden`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col overflow-x-hidden`}>
         <ConditionalHeader />
         {children}
       </body>
