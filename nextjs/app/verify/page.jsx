@@ -55,8 +55,8 @@ const Verify = () => {
 
     try {
       setLoading(true);
-
-      const response = await fetch("http://localhost:8000/verify", {
+      const BaseUrl = process.env.NEXT_PUBLIC_BASE_URL
+      const response = await fetch(`${BaseUrl}/verify`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

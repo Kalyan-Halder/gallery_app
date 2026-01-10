@@ -2,7 +2,7 @@
 import Add_Post from "./add_post"
 import Edit_Profile_Photos from "./edit_profile";
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react"; // Added useCallback
 import {Trash, Plus, Camera, Heart, MessageCircle, Share2, MoreVertical, Edit, Settings, LogOut, Grid, Bookmark, UserPlus, Users, MapPin, Calendar, Link as LinkIcon, MessageCirclePlus } from "lucide-react";
 import { useRouter } from "next/navigation";
  
@@ -17,16 +17,7 @@ const Profile = () => {
   
   const [edit_toggle, setEditToggle] = useState(false)
   const [toggle, setToggle] = useState(false)
-  const toggle_button = ()=>{
-      console.log(toggle)
-      setToggle(!toggle)
-  }
-  const edit_toggle_button = ()=>{
-      console.log(toggle)
-      setEditToggle(!edit_toggle)
-  }
   
-  //const token = localStorage.getItem('token')
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [data, setData] = useState(null);
@@ -46,52 +37,38 @@ const Profile = () => {
     avatarUrl:""
   });
 
-  const deletePost = async (postId) => {
-    console.log(postId);
-    try{
-      const response = await fetch("http://localhost:8000/delete_post", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({post_id:postId}),
-      });
-    }catch(err){
-      console.log(err)
-    }
-  };
-
-  useEffect(() => {
-  const fetchData = async () => {
+  // Create a fetchData function that can be called multiple times
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-
+      const BaseUrl = process.env.NEXT_PUBLIC_BASE_URL
       const token = localStorage.getItem("token");
-      setToken(token)
-      const response = await fetch("http://localhost:8000/profile", {
+      setToken(token);
+      
+      // Fetch profile data
+      const response = await fetch(`${BaseUrl}/profile`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token }),
       });
 
-      const posts = await fetch("http://localhost:8000/self_post", {
+      // Fetch posts data
+      const postsResponse = await fetch(`${BaseUrl}/self_post`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token }),
       });
 
       const result = await response.json();
-      const data = await posts.json();
-      console.log("Result:", result);
-      //console.log("posts", data.post);
+      const postsData = await postsResponse.json();
 
-      if (!response.ok || !posts.ok) {
+      if (!response.ok || !postsResponse.ok) {
         throw new Error(result?.message || `Error: ${response.status}`);
-      }else{
+      } else {
         const initials = (result.first_name?.[0] ?? "") + (result.last_name?.[0] ?? "");
         setProfileData({
-          name : `${result.first_name} ${result.last_name}`,
-          username : `@${result.username}`,
+          name: `${result.first_name} ${result.last_name}`,
+          username: `@${result.username}`,
           followers: result.followers,
           following: result.following,
           posts: result.posts,
@@ -100,25 +77,71 @@ const Profile = () => {
           website: result.weblink,
           joinDate: `Joined ${result.dateStr}`,
           initial: initials,
-          coverUrl : result.coverUrl,
+          coverUrl: result.coverUrl,
           avatarUrl: result.avatarUrl
-        })
+        });
 
-        setPosts(data.post)
-        
+        setPosts(postsData.post || []);
       }
-      
     } catch (err) {
       console.error("Fetch error:", err);
       setError(err.message || "Unknown error");
     } finally {
       setLoading(false);
     }
-      };
+  }, []);
 
-      fetchData();
-    }, []);
+  // Initial fetch
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
+  const toggle_button = () => {
+    setToggle(!toggle);
+  };
+
+  const edit_toggle_button = () => {
+    setEditToggle(!edit_toggle);
+  };
+
+  const deletePost = async (postId) => {
+      const token = localStorage.getItem("token");
+
+      // optimistic UI remove (string-safe)
+      setPosts(prev => prev.filter(p => String(p._id) !== String(postId)));
+      setProfileData(prev => ({
+        ...prev,
+        posts: Math.max(0, Number(prev.posts || 0) - 1),
+      }));
+
+      try {
+        const res = await fetch("http://localhost:8000/delete_post", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token, post_id: postId }),
+          cache: "no-store",
+        });
+
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data?.message || "Failed to delete post");
+  
+      } catch (e) {
+        console.error(e);
+        // rollback by refetching everything if delete failed
+        fetchData();
+      }
+   };
+
+
+  // Callback function to refresh data after adding a post
+  const handlePostAdded = () => {
+    fetchData(); // Refresh posts and profile data
+  };
+
+  // Callback function to refresh data after editing profile
+  const handleProfileUpdated = () => {
+    fetchData(); // Refresh profile data
+  };
 
   const savedPosts = [
     { id: 7, likes: 567, comments: 42, image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4" },
@@ -148,7 +171,7 @@ const Profile = () => {
       {/* Cover Photo */}
       <div className="relative h-64 md:h-80 bg-linear-to-r from-blue-600 via-purple-600 to-pink-600">
         <div className="absolute inset-0 bg-black/30">
-             <div className="h-full w-full bg-cover bg-center transition-transform duration-500 group-hover:scale-110" style={{ backgroundImage: `url(${profileData.coverUrl})` }}/>
+          <div className="h-full w-full bg-cover bg-center transition-transform duration-500 group-hover:scale-110" style={{ backgroundImage: `url(${profileData.coverUrl})` }}/>
         </div>
       </div>
 
@@ -164,15 +187,15 @@ const Profile = () => {
                   <div className="h-32 w-32 md:h-40 md:w-40 rounded-2xl border-4 border-white shadow-lg bg-linear-to-br from-blue-400 to-purple-500 overflow-hidden">
                     {/* Placeholder for profile image */}
                     <div className="h-full w-full flex items-center justify-center text-white text-5xl font-bold">
-                    {!profileData.avatarUrl ? (
-                      <span>{profileData.initial}</span>
-                    ) : (
-                      <div
-                        className="h-full w-full bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
-                        style={{ backgroundImage: `url(${profileData.avatarUrl})` }}
-                      />
-                    )}
-                  </div>
+                      {!profileData.avatarUrl ? (
+                        <span>{profileData.initial}</span>
+                      ) : (
+                        <div
+                          className="h-full w-full bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
+                          style={{ backgroundImage: `url(${profileData.avatarUrl})` }}
+                        />
+                      )}
+                    </div>
                   </div>
                   <button className="absolute bottom-2 right-2 p-2 bg-white rounded-full shadow-md hover:shadow-lg transition-shadow" onClick={edit_toggle_button}>
                     <Edit className="h-4 w-4 text-gray-700" />
@@ -246,10 +269,6 @@ const Profile = () => {
                         <div className="text-sm text-gray-600">Following</div>
                       </div>
                     </div>
-                    <div>
-                    </div>
-                    {toggle && (<Add_Post open={toggle} onClose={toggle_button} token={user_token} />)}
-                    {edit_toggle && (<Edit_Profile_Photos open={edit_toggle} onClose={edit_toggle_button} token={user_token} />)}
                   </div>
                 </div>
               </div>
@@ -315,16 +334,14 @@ const Profile = () => {
 
                           {confirmDeleteId === post._id && (
                             <div className="fixed inset-0 z-9999 flex items-center justify-center">
-                      
                               <div
                                 className="absolute inset-0 bg-black/40"
                                 onClick={() => setConfirmDeleteId(null)}
                               />
-
                               
                               <div className="relative z-10 w-[90%] max-w-sm rounded-xl bg-white shadow-lg border border-gray-200 p-4">
                                 <p className="text-sm text-gray-800 mb-4">
-                                  Delete this post? This can’t be undone.
+                                  Delete this post? This can't be undone.
                                 </p>
 
                                 <div className="flex justify-end gap-2">
@@ -349,7 +366,6 @@ const Profile = () => {
                             </div>
                           )}
                         </div>
-
 
                         <button className="p-2 bg-white/20 backdrop-blur-sm rounded-full hover:bg-blue-500 m-1">
                           <Share2 className="h-5 w-5" />
@@ -406,6 +422,24 @@ const Profile = () => {
           </div>
         </div>
       </div>
+
+      {/* Modals - Add these at the end of the return statement */}
+      {toggle && (
+        <Add_Post 
+          open={toggle} 
+          onClose={toggle_button} 
+          token={user_token} 
+          onSuccess={handlePostAdded} // Add this prop
+        />
+      )}
+      {edit_toggle && (
+        <Edit_Profile_Photos 
+          open={edit_toggle} 
+          onClose={edit_toggle_button} 
+          token={user_token} 
+          onSuccess={handleProfileUpdated} // Add this prop
+        />
+      )}
 
       {/* Edit Profile Modal */}
       {isEditing && (

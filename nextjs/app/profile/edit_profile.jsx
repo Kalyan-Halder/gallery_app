@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-const Edit_Profile_Photos = ({ open = false, onClose = () => {}, token = "" }) => {
+const Edit_Profile_Photos = ({ open = false, onClose = () => {}, token = "", onSuccess = () => {} }) => {
   const [avatarFile, setAvatarFile] = useState(null);
   const [coverFile, setCoverFile] = useState(null);
 
@@ -45,8 +45,8 @@ const Edit_Profile_Photos = ({ open = false, onClose = () => {}, token = "" }) =
       // If your backend expects different names, change these two keys:
       if (avatarFile) fd.append("avatar", avatarFile);
       if (coverFile) fd.append("cover", coverFile);
-
-      const response = await fetch("http://localhost:8000/edit_profile", {
+      const BaseUrl = process.env.NEXT_PUBLIC_BASE_URL
+      const response = await fetch(`${BaseUrl}/edit_profile`, {
         method: "POST",
         body: fd,
       });
@@ -61,7 +61,7 @@ const Edit_Profile_Photos = ({ open = false, onClose = () => {}, token = "" }) =
 
       setSuccess(true);
       setMessage(data?.message || "Profile updated!");
-
+      onSuccess();
       setTimeout(() => {
         onClose();
       }, 800);

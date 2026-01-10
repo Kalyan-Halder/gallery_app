@@ -23,7 +23,8 @@ const Feeds = () => {
       const fetchData = async () => {
       const token = localStorage.getItem("token");
       try{
-         const response = await fetch("http://localhost:8000/all_post", {
+        const BaseUrl = process.env.NEXT_PUBLIC_BASE_URL
+         const response = await fetch(`${BaseUrl}/all_post`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body:JSON.stringify({"token": token} )
@@ -94,6 +95,7 @@ const Feeds = () => {
   };
 
   const handleShare = (postId) => {
+
     navigator.clipboard.writeText(`https://shuttersphere.com/post/${postId}`);
     // You could add a toast notification here
     alert("Link copied to clipboard!");

@@ -5,7 +5,6 @@ const posts = require("../utils/post_schema")
 
 router.route("/all_post").post(async (req, res) => {
     try {
-        console.log(req.body)
         const allPosts = await posts.find({})
             .sort({ created_at: -1 })
             .lean();

@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Link from "next/link";
 const Signin = () => {
+  
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -32,7 +33,8 @@ const Signin = () => {
     try {
       setLoading(true);
 
-      const response = await fetch("http://localhost:8000/signin", {
+      const BaseUrl = process.env.NEXT_PUBLIC_BASE_URL
+      const response = await fetch(`${BaseUrl}/signin`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

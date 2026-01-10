@@ -20,7 +20,8 @@ const Feeds = () => {
     // Simulate API call
     const fetchData = async () => {
       try{
-         const response = await fetch("http://localhost:8000/all_post", {
+         const BaseUrl = process.env.NEXT_PUBLIC_BASE_URL
+         const response = await fetch(`${BaseUrl}/all_post`, {
             method: "GET",
             headers: { "Content-Type": "application/json" }
           });

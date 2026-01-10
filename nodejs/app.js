@@ -9,7 +9,7 @@ const router = require("./router/routes")
 const app = express()
 
 dotenv.config({path:"./config.env"})
-const port = process.env.PORT
+const port = process.env.PORT || port
 
 // Using router
 app.use(cors())

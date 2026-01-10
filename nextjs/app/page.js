@@ -6,11 +6,11 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 
 const PHOTOS = [
-  '/home1.jpg',
-  '/home2.jpg',
+  '/home5.jpg',
   '/home3.jpg',
   '/home4.jpg',
-  '/home5.jpg',
+  '/home2.jpg',
+  '/home1.jpg',
    
 ];
 
@@ -62,12 +62,10 @@ function AnimatedBurst({ onDone, spreadDone }) {
   const cards = useMemo(() => {
     const count = PHOTOS.length;
 
-    // bigger spread radius
     const RADIUS = 240;
     const Y_SQUASH = 0.88;
 
-    // EDIT THIS to change starting point of the circle:
-    // 0 = right, -Math.PI/2 = top, Math.PI/2 = bottom, Math.PI = left
+   
     const START_ANGLE = -Math.PI / 2;
 
     return Array.from({ length: count }).map((_, i) => {
@@ -102,10 +100,8 @@ function AnimatedBurst({ onDone, spreadDone }) {
             className="absolute left-1/2 top-1/2 origin-center"
             style={{
               zIndex: c.z,
-              // force transform origin center (no React warning)
               transformOrigin: '50% 50%',
             }}
-            // IMPORTANT: keeps the card centered at (50%,50%) before motion transforms
             transformTemplate={(transform, generated) => `translate(-50%, -50%) ${generated}`}
             initial={{ x: 0, y: 0, rotate: -12 + i * 3, scale: 0.78, opacity: 0 }}
             animate={
@@ -133,10 +129,10 @@ function AnimatedBurst({ onDone, spreadDone }) {
               if (!spreadDone && i === lastIndex) onDone();
             }}
           >
-            {/* gentle floating AFTER spread */}
+           
             <motion.div
               className="origin-center"
-              style={{ transformOrigin: '50% 50%' }} // center rotation (no React warning)
+              style={{ transformOrigin: '50% 50%' }} 
               animate={
                 spreadDone
                   ? {
@@ -169,7 +165,7 @@ export default function HomePage() {
   const [mounted, setMounted] = useState(false);
   const [spreadDone, setSpreadDone] = useState(false);
 
-  // hydration-safe: only animate after mount
+
   useEffect(() => setMounted(true), []);
 
   return (
@@ -179,7 +175,7 @@ export default function HomePage() {
 
       {/* layout */}
       <div className="relative z-10 h-full w-full flex flex-col items-center">
-        {/* TOP TEXT (kept above photos) */}
+       
         <div className="w-full max-w-6xl px-6 pt-10 sm:pt-14 text-center select-none relative z-30">
           {mounted ? (
             <>
@@ -195,7 +191,7 @@ export default function HomePage() {
                 initial={{ opacity: 0, y: 16, filter: 'blur(6px)' }}
                 animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                 transition={{ duration: 0.9, delay: 0.12, ease: 'easeOut' }}
-                className="mt-3 text-2xl sm:text-2xl text-green-400"
+                className="mt-3 text-2xl sm:text-2xl text-white"
               >
                 And store forever for everyone
               </motion.h2>
@@ -205,7 +201,7 @@ export default function HomePage() {
               <h1 className="text-5xl sm:text-5xl font-bold tracking-tight text-white drop-shadow">
                 Capture your creative shot
               </h1>
-              <h2 className="mt-3 text-xl sm:text-2xl text-green-400">
+              <h2 className="mt-3 text-2xl sm:text-2xl text-white">
                 And store forever for everyone
               </h2>
             </>
@@ -214,7 +210,7 @@ export default function HomePage() {
             
         </div>
 
-        {/* MIDDLE VISUAL */}
+       
         <div className="flex-1 w-full flex items-center justify-center px-6 relative z-20">
           {mounted ? (
             <AnimatedBurst onDone={() => setSpreadDone(true)} spreadDone={spreadDone} />
@@ -223,7 +219,7 @@ export default function HomePage() {
           )}
         </div>
 
-        {/* CTA (centered) */}
+       
         <div className="w-full px-6 pb-10 sm:pb-12 flex justify-center relative z-30">
           {mounted ? (
             <motion.div
@@ -240,7 +236,7 @@ export default function HomePage() {
               </Link>
             </motion.div>
           ) : (
-            // keeps markup consistent for hydration
+            
             <div className="opacity-0 absolute">
               <Link href="/login" className={CTA_CLASS}>
                 Go to Login <span aria-hidden>→</span>

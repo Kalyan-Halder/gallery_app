@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 
-const Add_Post = ({ open = false, onClose = () => {}, token = "" }) => {
+const Add_Post = ({ open = false, onClose = () => {}, token = "", onSuccess = () => {} }) => {
   const [formData, setFormData] = useState({
     token:"",
     description: "",
@@ -57,8 +57,8 @@ const Add_Post = ({ open = false, onClose = () => {}, token = "" }) => {
       if (file) {
         fd.append("file", file); // key name "file" (backend should match)
       }
-
-      const response = await fetch("http://localhost:8000/create_post", {
+      const BaseUrl = process.env.NEXT_PUBLIC_BASE_URL
+      const response = await fetch(`${BaseUrl}/create_post`, {
         method: "POST",
         body: fd,
       });
@@ -72,7 +72,7 @@ const Add_Post = ({ open = false, onClose = () => {}, token = "" }) => {
 
       setSuccess(true);
       setError("Post created!");
-
+      onSuccess();
       setTimeout(() => {
         onClose();
       }, 800);
