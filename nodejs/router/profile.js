@@ -57,7 +57,7 @@ router.route("/self_post").post(async (req,res)=>{
             if(!userExist){
                 res.status(401).json({message:"Something Went Worng"})
             }else{
-                const post = await posts.find({user_id:userExist._id})
+                const post = await posts.find({user_id:userExist._id}).sort({ created_At: -1 });
                 if(!post){
                     return res.status(404).json({message:"No Post Found"})
                 }else{
@@ -170,6 +170,7 @@ router.route("/delete_post").post(async (req,res)=>{
   try{
     
     const {post_id} = req.body;
+    console.log(req.body)
     const post = await posts.findOne({_id:post_id})
     if(!post){
       return res.status(400).json({message:"Post Does Not Exist"})
