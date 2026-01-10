@@ -35,7 +35,7 @@ const Add_Post = ({ open = false, onClose = () => {}, token = "", onSuccess = ()
     setSuccess(false);
 
     if (!formData.description || !formData.tags) {
-      setError("user_id, and description are required");
+      setError("Caption is required");
       return;
     }
 
