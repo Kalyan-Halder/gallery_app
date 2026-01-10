@@ -57,7 +57,7 @@ router.route("/self_post").post(async (req,res)=>{
             if(!userExist){
                 res.status(401).json({message:"Something Went Worng"})
             }else{
-                const post = await posts.find({user_id:userExist._id}).sort({ created_At: -1 });
+                const post = await posts.find({user_id:userExist._id}).sort({ created_at: -1 });
                 if(!post){
                     return res.status(404).json({message:"No Post Found"})
                 }else{
