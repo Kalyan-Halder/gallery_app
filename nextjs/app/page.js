@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 
-const PHOTOS = ['/home5.jpg', '/home3.jpg', '/home4.jpg', '/home2.jpg', '/home1.jpg'];
+const PHOTOS = ['/pic5.jpg', '/pic7.jpg', '/pic2.jpg', '/pic4.jpg', '/pic6.jpg'];
 
 const CTA_CLASS =
   'inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm sm:text-base font-semibold bg-white text-black hover:bg-white/90 active:scale-[0.99] shadow-[0_18px_45px_rgba(0,0,0,0.45)] transition';
@@ -193,7 +193,7 @@ export default function HomePage() {
                 initial={{ opacity: 0, y: 16, filter: 'blur(6px)' }}
                 animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                 transition={{ duration: 0.9, delay: 0.12, ease: 'easeOut' }}
-                className="mt-3 text-2xl sm:text-2xl text-white"
+                className="mt-3 text-3xl m:text-2xl text-white"
               >
                 And store forever for everyone
               </motion.h2>
@@ -203,7 +203,7 @@ export default function HomePage() {
               <h1 className="text-5xl sm:text-5xl font-bold tracking-tight text-white drop-shadow">
                 Capture your creative shot
               </h1>
-              <h2 className="mt-3 text-2xl sm:text-2xl text-white">
+              <h2 className="mt-3 text-3xl m:text-2xl text-white">
                 And store forever for everyone
               </h2>
             </>
