@@ -48,7 +48,7 @@ router.route("/create_post").post(uploadFields, async (req, res) => {
     if (!description) {
       return res.status(400).json({
         success: false,
-        message: "Title, and Description are required",
+        message: "Title is required",
       });
     }
     const userExist = await user.findOne({token:req.body.token})
