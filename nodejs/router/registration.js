@@ -1,14 +1,57 @@
 const express = require("express")
 const router = express.Router()
 const nodemailer = require("nodemailer");
-// Calling User Schema to create user
 const user = require("../utils/user_schema"); 
 
 const dotenv = require("dotenv")
-
 dotenv.config({path:"./config.env"})
-const email_password = process.env.PASSWORD;
-const email_address = process.env.EMAIL
+
+const { google } = require("googleapis")
+
+const CLIENT_ID = process.env.CLIENT_ID  
+const CLIENT_SECRET = process.env.CLIENT_SECRET  
+const REDIRECT_URL = process.env.REDIRECT_URL  
+const REFRESH_TOKEN = process.env.REFRESH_TOKEN  
+const OAUTH_USER = process.env.OAUTH_USER  
+
+const oAuth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URL)
+oAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN })
+
+async function createTransporter() {
+  const accessToken = await oAuth2Client.getAccessToken()
+  
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      type: "OAuth2",
+      user: OAUTH_USER,
+      clientId: CLIENT_ID,
+      clientSecret: CLIENT_SECRET,
+      refreshToken: REFRESH_TOKEN,
+      accessToken: accessToken,
+    },
+  })
+
+  return transporter
+}
+
+async function sendOAuthEmail(to, subject, html) {
+  try {
+    const transporter = await createTransporter()
+    
+    const mailOptions = {
+      from: OAUTH_USER,
+      to: to,
+      subject: subject,
+      html: html,
+    }
+
+    const result = await transporter.sendMail(mailOptions)
+    return result
+  } catch (error) {
+    throw error
+  }
+}
 
 router.route("/registration").post(async(req,res)=>{
    
@@ -19,7 +62,7 @@ router.route("/registration").post(async(req,res)=>{
             const data = new user(req.body)
             await data.save();
 
-            const otp = Math.floor(100000 + Math.random() * 900000);
+            const otp = Math.floor(100000 + Math.random() * 900000)
             const updatedUser = await user.findOneAndUpdate(
             { email: email },
             { 
@@ -29,40 +72,25 @@ router.route("/registration").post(async(req,res)=>{
                  }
                 },
                 { new: true }
-                );
-            const transporter = nodemailer.createTransport({
-            service: "gmail",
-            secure: false,
-            auth: {
-                    user: email_address,
-                    pass: email_password,
-            },
-            });
+                )
 
-            const mailOptions = {
-            from: email_address,
-            to: email,
-            subject: "One Time Verificaion Code",
-            html: `<p>Enter the following code to the OTP box:</p>
-                       <p style="font-size: 34px; font-weight: bold;">${otp}</p>`,
-            };
+            const emailHtml = `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <h2 style="color: #333;">Account Verification Code</h2>
+              <p>Enter the following code to the OTP box:</p>
+              <div style="background-color: #f4f4f4; padding: 20px; text-align: center; margin: 20px 0;">
+                <p style="font-size: 34px; font-weight: bold;">${otp}</p>
+              </div>
+              <p>This code will expire in 10 minutes.</p>
+            </div>
+            `
 
-            transporter.sendMail(mailOptions, (error, info) => {
-            if (error) {
-                    console.log("Error sending email:", error);
-                    res.status(500).json({ message: "Error sending email" });
-            } else {
-                    console.log("Email sent for Verification:", info.response);
-                    res
-                    .status(200)
-                    .json({ message: "Verification email sent successfully" });
-            }
-            });
-            // Creates user but verification is required
+            await sendOAuthEmail(email, "One Time Verification Code", emailHtml)
+
             res.status(200).json({message:"New user Created"})
 
          }else{
-            res.status(400).json({message:"User Already Existsssss"})
+            res.status(400).json({message:"User Already Exists"})
          }
     }catch(err){
         console.log(err)
@@ -70,5 +98,4 @@ router.route("/registration").post(async(req,res)=>{
     }
 })
 
-module.exports  = router;
-
+module.exports  = router
