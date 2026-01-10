@@ -115,7 +115,7 @@ const Profile = () => {
       }));
 
       try {
-        const res = await fetch("http://localhost:8000/delete_post", {
+        const res = await fetch(`${BaseUrl}/delete_post`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ token, post_id: postId }),

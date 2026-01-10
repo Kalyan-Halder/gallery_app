@@ -34,6 +34,7 @@ const Signin = () => {
       setLoading(true);
 
       const BaseUrl = process.env.NEXT_PUBLIC_BASE_URL
+      console.log(BaseUrl)
       const response = await fetch(`${BaseUrl}/signin`, {
         method: "POST",
         headers: {
