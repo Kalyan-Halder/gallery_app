@@ -2,6 +2,7 @@ const express = require("express")
 const router = express.Router()
 const user = require("../utils/user_schema");
 const posts = require("../utils/post_schema")
+const mongoose = require("mongoose")
 
 
 router.route("/profile").post(async (req, res) =>{
@@ -58,10 +59,25 @@ router.route("/self_post").post(async (req,res)=>{
                 res.status(401).json({message:"Something Went Worng"})
             }else{
                 const post = await posts.find({user_id:userExist._id}).sort({ created_at: -1 });
+
+                //also send the saved post
+                const users_saved = await user.findOne({token}).select("savedPost");
+                const ids = users_saved.savedPost;
+                const objectIds = ids.map(id => new mongoose.Types.ObjectId(id));
+                const saved_posts = await posts.find({ _id: { $in: objectIds } });
+                saved_posts.sort((a, b) => ids.indexOf(String(a._id)) - ids.indexOf(String(b._id)));
+
+                //also send the liked post
+                const users_liked = await user.findOne({token}).select("likedPost");
+                const idss = users_liked.likedPost;
+                const objectIdss = idss.map(id => new mongoose.Types.ObjectId(id));
+                const liked_posts = await posts.find({ _id: { $in: objectIdss } });
+                liked_posts.sort((a, b) => ids.indexOf(String(a._id)) - ids.indexOf(String(b._id)));
+                
                 if(!post){
                     return res.status(404).json({message:"No Post Found"})
                 }else{
-                    return res.status(200).json({post})
+                    return res.status(200).json({post:post,saved_posts,liked_posts})
                 }
             }
         }
@@ -169,11 +185,12 @@ router.route("/edit_profile").post(uploadFields, async (req, res) => {
 router.route("/delete_post").post(async (req,res)=>{
   try{
     
-    const {post_id} = req.body;
+    const {token,post_id} = req.body;
     console.log(req.body)
     const post = await posts.findOne({_id:post_id})
-    if(!post){
-      return res.status(400).json({message:"Post Does Not Exist"})
+    const userExist = await user.findOne({token})
+    if(!post || (post.user_id !== userExist._id)){
+      return res.status(400).json({message:"Post Does Not Exist or can not be deleted"})
     }else{
       const user_id = post.user_id;
       
@@ -187,6 +204,121 @@ router.route("/delete_post").post(async (req,res)=>{
     console.log(err)
   }
 })
+
+router.route("/save_post").post(async (req, res) => {
+  try {
+    const { post_id, token } = req.body;
+
+    if (!post_id || !token) {
+      return res.status(400).json({ message: "post_id and token are required" });
+    }
+
+    const userExist = await user.findOne({ token });
+    const postExist = await posts.findById(post_id);
+
+
+    if (!userExist || !postExist) {
+      return res.status(400).json({ message: "something went wrong" });
+    }
+
+    const alreadySaved = (userExist.savedPost || []).some(
+      (id) => id.toString() === post_id.toString()
+    );
+
+    if (alreadySaved) {
+      await user.updateOne(
+        { _id: userExist._id },
+        { $pull: { savedPost: post_id } }
+      );
+      return res.status(201).json({ message: "Post removed from saved", saved: false });
+    } else {
+      await user.updateOne(
+        { _id: userExist._id },
+        { $addToSet: { savedPost: post_id } } // avoids duplicates
+      );
+  
+      const user_with_updated_saved_post = await user.findOne({token})
+      return res.status(200).json({ saved_posts:user_with_updated_saved_post.savedPost,message: "Post saved", saved: true });
+    }
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+router.route("/like_post").post(async (req, res) => {
+  try {
+    const { post_id, token } = req.body;
+    console.log(req.body);
+    
+    if (!post_id || !token) {
+      return res.status(400).json({ message: "post_id and token are required" });
+    }
+
+    const userExist = await user.findOne({ token });
+    const postExist = await posts.findById(post_id);
+
+    if (!userExist || !postExist) {
+      return res.status(400).json({ message: "something went wrong" });
+    }
+
+    const alreadyLiked = (userExist.likedPost || []).some(
+      (id) => id.toString() === post_id.toString()
+    );
+
+    if (alreadyLiked) {
+      // Unlike: Remove from user's liked posts and decrement post likes
+      await Promise.all([
+        user.updateOne(
+          { _id: userExist._id },
+          { $pull: { likedPost: post_id } }
+        ),
+        posts.updateOne(
+          { _id: post_id },
+          { $inc: { likes: -1 } }
+        )
+      ]);
+      
+      // Fetch updated post to get current like count
+      const updatedPost = await posts.findById(post_id);
+      const user_with_updated_liked_post = await user.findOne({ token });
+      
+      return res.status(201).json({ 
+        liked_posts: user_with_updated_liked_post.likedPost,
+        updatedLikes: updatedPost.likes,
+        message: "Post removed from liked", 
+        liked: false 
+      });
+    } else {
+      // Like: Add to user's liked posts and increment post likes
+      await Promise.all([
+        user.updateOne(
+          { _id: userExist._id },
+          { $addToSet: { likedPost: post_id } }
+        ),
+        posts.updateOne(
+          { _id: post_id },
+          { $inc: { likes: 1 } }
+        )
+      ]);
+      
+      // Fetch updated post to get current like count
+      const updatedPost = await posts.findById(post_id);
+      const user_with_updated_liked_post = await user.findOne({ token });
+      
+      return res.status(200).json({ 
+        liked_posts: user_with_updated_liked_post.likedPost,
+        updatedLikes: updatedPost.likes,
+        message: "Post liked", 
+        liked: true 
+      });
+    }
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
 
 
 module.exports = router

@@ -40,6 +40,10 @@ const Profile = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [data, setData] = useState(null);
+  const [savedPosts, setSavedPosts] = useState([
+  ])
+  const [likedPosts,setlikedPosts] = useState([
+  ]) 
 
   const [profileData, setProfileData] = useState({
     name: "",
@@ -80,7 +84,7 @@ const Profile = () => {
 
       const result = await response.json();
       const postsData = await postsResponse.json();
-
+    
       if (!response.ok || !postsResponse.ok) {
         throw new Error(result?.message || `Error: ${response.status}`);
       } else {
@@ -102,6 +106,8 @@ const Profile = () => {
         });
 
         setPosts(postsData.post || []);
+        setSavedPosts(postsData.saved_posts)
+        setlikedPosts(postsData.liked_posts)
       }
     } catch (err) {
       console.error("Fetch error:", err);
@@ -162,36 +168,6 @@ const Profile = () => {
     fetchData(); // Refresh profile data
   };
 
-  const savedPosts = [
-    {
-      id: 7,
-      likes: 567,
-      comments: 42,
-      image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4",
-    },
-    {
-      id: 8,
-      likes: 389,
-      comments: 27,
-      image: "https://images.unsplash.com/photo-1518837695005-2083093ee35b",
-    },
-  ];
-
-  const likedPosts = [
-    {
-      id: 9,
-      likes: 654,
-      comments: 56,
-      image: "https://images.unsplash.com/photo-1493246507139-91e8fad9978e",
-    },
-    {
-      id: 10,
-      likes: 432,
-      comments: 38,
-      image: "https://images.unsplash.com/photo-1519681393784-d120267933ba",
-    },
-  ];
-
   const renderPosts = () => {
     switch (activeTab) {
       case "posts":
@@ -212,7 +188,7 @@ const Profile = () => {
   return (
     <div className="h-auto bg-gray-200">
       {/* Cover Photo */}
-      <div className="relative h-64 md:h-80 bg-linear-to-r from-blue-600 via-purple-600 to-pink-600">
+      <div className="relative h-84 md:h-100 bg-linear-to-r from-blue-600 via-purple-600 to-pink-600">
         <div className="absolute inset-0 bg-black/30">
           <div
             className="h-full w-full bg-cover bg-center transition-transform duration-500 group-hover:scale-110"

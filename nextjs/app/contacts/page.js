@@ -112,7 +112,7 @@ const Contact = () => {
 
             {/* Social Media */}
             <div className="bg-white rounded-2xl p-8 shadow-lg">
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">Follow Us</h3>
+              <h3 className="text-2xl font-bold text-gray-400 mb-6">Follow Us</h3>
               <div className="flex space-x-4">
                 <a href="#" className="group">
                   <div className="p-3 bg-linear-to-r from-blue-500 to-cyan-500 rounded-xl group-hover:scale-110 transition-transform">

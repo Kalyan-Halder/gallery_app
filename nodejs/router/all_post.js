@@ -120,12 +120,14 @@ router.route("/all_post").post(async (req, res) => {
             return {
                 id: post._id,
                 watcher_avatar: watching_user.avatarUrl,
+                watcher_savedPosts: watching_user.savedPost || ["something missing"],
+                watcher_likedPosts: watching_user.likedPost || ["something missing"],
                 user: {
                     name: displayName,
                     username: username,
                     avatar: avatar,
                     color: color,
-                    avatarUrl: userData.avatarUrl
+                    avatarUrl: userData.avatarUrl,
                 },
                 image: post.url || "",
                 caption: post.description || "",

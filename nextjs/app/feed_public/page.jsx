@@ -60,7 +60,7 @@ const Feeds = () => {
     console.log("Posts state updated:", posts);
   }, [posts]);
 
-  const handleLike = (postId) => {
+  const handleLike = async (postId) => {
     const newLiked = new Set(likedPosts);
     if (newLiked.has(postId)) {
       newLiked.delete(postId);
@@ -78,14 +78,8 @@ const Feeds = () => {
     setLikedPosts(newLiked);
   };
 
-  const handleSave = (postId) => {
-    const newSaved = new Set(savedPosts);
-    if (newSaved.has(postId)) {
-      newSaved.delete(postId);
-    } else {
-      newSaved.add(postId);
-    }
-    setSavedPosts(newSaved);
+  const handleSave = async (postId) => {
+     console.log(postId)
   };
 
   const handleShare = (postId) => {
@@ -113,7 +107,7 @@ const Feeds = () => {
   }
 
   return (
-    <div className="h-auto bg-gray-200">
+    <div className="h-full bg-gray-200">
        
 
       {/* Main Content */}
@@ -150,7 +144,7 @@ const Feeds = () => {
                 <div className="p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                      <div className={`h-10 w-10 rounded-full bg-gradient-to-r ${post.user?.color || "from-gray-500 to-gray-700"} flex items-center justify-center text-white font-semibold`}>
+                      <div className={`h-10 w-10 rounded-full bg-linear-to-r ${post.user?.color || "from-gray-500 to-gray-700"} flex items-center justify-center text-white font-semibold`}>
                         {post.user?.avatar || "UU"}
                       </div>
                       <div>

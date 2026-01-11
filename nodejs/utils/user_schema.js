@@ -41,7 +41,9 @@ const schema = new mongoose.Schema({
         default:""
     },
     avatarUrl:String,
-    coverUrl: String
+    coverUrl: String,
+    savedPost: Array,
+    likedPost: Array
 });
 
 schema.pre('save', async function() {

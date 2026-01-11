@@ -24,7 +24,7 @@ const Navigation = () => {
   }
   return (
     <header className="sticky top-0 z-50 w-full border-b border-gray-100 bg-white backdrop-blur-md">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
         <div className="flex h-16 items-center justify-between">
           
           {/* Logo Section */}
@@ -37,8 +37,8 @@ const Navigation = () => {
                 <div className="absolute inset-0 bg-linear-to-r from-blue-500 to-purple-500 rounded-lg blur opacity-25 group-hover:opacity-40 transition-opacity"></div>
                 <Image
                   src={webIcon}
-                  width={40}
-                  height={40}
+                  width={60}
+                  height={60}
                   alt="Logo"
                   className="relative rounded-lg shadow-sm group-hover:scale-105 transition-transform duration-200"
                 />
@@ -47,7 +47,7 @@ const Navigation = () => {
               <span className="text-l font-bold bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 Shutter Sphere
               </span>
-              <span className="text-xs text-gray-500">Capture & Share</span>
+              <span className="text-s text-gray-400">Capture & Share</span>
             </div>
             </Link>
           </div>
@@ -58,7 +58,7 @@ const Navigation = () => {
               <Link
                 key={item.name}
                 href={item.href}
-                className="relative px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors group"
+                className="relative px-4 py-2 text-l font-medium text-gray-700 hover:text-blue-600 transition-colors group"
               >
                 <span className="absolute -inset-1 rounded-lg bg-linear-to-r from-blue-50 to-purple-50 opacity-0 group-hover:opacity-100 transition-opacity"></span>
                 <span className="relative flex items-center space-x-2">
