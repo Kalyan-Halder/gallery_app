@@ -133,7 +133,6 @@ const Profile = () => {
   const deletePost = async (postId) => {
     const token = localStorage.getItem("token");
 
-    // optimistic UI remove (string-safe)
     setPosts((prev) => prev.filter((p) => String(p._id) !== String(postId)));
     setProfileData((prev) => ({
       ...prev,
@@ -153,7 +152,6 @@ const Profile = () => {
       if (!res.ok) throw new Error(data?.message || "Failed to delete post");
     } catch (e) {
       console.error(e);
-      // rollback by refetching everything if delete failed
       fetchData();
     }
   };

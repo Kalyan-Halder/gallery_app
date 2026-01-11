@@ -189,7 +189,7 @@ router.route("/delete_post").post(async (req,res)=>{
     console.log(req.body)
     const post = await posts.findOne({_id:post_id})
     const userExist = await user.findOne({token})
-    if(!post || (post.user_id !== userExist._id)){
+    if(!post || (post.user_id != userExist._id)){
       return res.status(400).json({message:"Post Does Not Exist or can not be deleted"})
     }else{
       const user_id = post.user_id;
