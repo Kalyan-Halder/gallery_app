@@ -1,6 +1,9 @@
 "use client";
 import Add_Post from "./add_post";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+
+
 import {
   MapMinus,
   Heart,
@@ -16,12 +19,14 @@ import {
 <MapMinus />;
 const Feeds = () => {
   const [activeFilter, setActiveFilter] = useState("following");
+  const router = useRouter();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [savedPosts, setSavedPosts_toggle] = useState([]);
   const [likedPosts, setLikedPosts_toggle] = useState([]);
   const [toggle, setToggle] = useState(false);
   const [user_token, setToken] = useState("");
+  
   const toggle_button = () => {
     console.log(toggle);
     setToggle(!toggle);
@@ -77,14 +82,23 @@ const Feeds = () => {
     const token = localStorage.getItem("token");
     console.log(postId);
 
+    // Prevent rapid clicking - return if already processing
+    if (window.likeInProgress && window.likeInProgress[postId]) return;
+
+    // Set processing flag
+    if (!window.likeInProgress) window.likeInProgress = {};
+    window.likeInProgress[postId] = true;
+
     try {
-      // Optimistic update: Update the UI immediately before the API call
+      // Get current liked status using current state (not stale closure)
+      const isCurrentlyLiked = (likedPosts || []).some(
+        (id) => String(id) === String(postId)
+      );
+
+      // Optimistic update: Update the UI immediately
       setPosts((prevPosts) =>
         prevPosts.map((post) => {
           if (String(post.id || post._id) === String(postId)) {
-            const isCurrentlyLiked = (likedPosts || []).some(
-              (id) => String(id) === String(postId)
-            );
             return {
               ...post,
               likes: isCurrentlyLiked ? post.likes - 1 : post.likes + 1,
@@ -93,6 +107,15 @@ const Feeds = () => {
           return post;
         })
       );
+
+      // Update likedPosts state optimistically
+      if (isCurrentlyLiked) {
+        setLikedPosts_toggle((prev) =>
+          prev.filter((id) => String(id) !== String(postId))
+        );
+      } else {
+        setLikedPosts_toggle((prev) => [...prev, postId]);
+      }
 
       const BaseUrl = process.env.NEXT_PUBLIC_BASE_URL;
       const response = await fetch(`${BaseUrl}/like_post`, {
@@ -103,13 +126,12 @@ const Feeds = () => {
 
       const result = await response.json();
       console.log("Like response:", result);
-      console.log("liked_posts from response:", result.liked_posts);
-      console.log("updatedLikes from response:", result.updatedLikes);
 
       if (response.status === 200 || response.status === 201) {
-        setLikedPosts_toggle(result.liked_posts);
+        // Update likedPosts with server response
+        setLikedPosts_toggle(result.liked_posts || likedPosts);
 
-        // Update the post with the exact like count from the server
+        // Update the post with exact like count from server
         setPosts((prevPosts) =>
           prevPosts.map((post) => {
             if (String(post.id || post._id) === String(postId)) {
@@ -121,11 +143,66 @@ const Feeds = () => {
             return post;
           })
         );
+      } else {
+        // If server response fails, revert optimistic update
+        setTimeout(() => {
+          setPosts((prevPosts) =>
+            prevPosts.map((post) => {
+              if (String(post.id || post._id) === String(postId)) {
+                return {
+                  ...post,
+                  likes: isCurrentlyLiked ? post.likes : post.likes - 1,
+                };
+              }
+              return post;
+            })
+          );
+
+          if (isCurrentlyLiked) {
+            setLikedPosts_toggle((prev) => [...prev, postId]);
+          } else {
+            setLikedPosts_toggle((prev) =>
+              prev.filter((id) => String(id) !== String(postId))
+            );
+          }
+        }, 100);
       }
     } catch (err) {
       console.log(err);
-      // If there's an error, revert the optimistic update
-      // You might want to show an error message to the user
+
+      // Revert optimistic update on error
+      const isCurrentlyLiked = (likedPosts || []).some(
+        (id) => String(id) === String(postId)
+      );
+
+      setTimeout(() => {
+        setPosts((prevPosts) =>
+          prevPosts.map((post) => {
+            if (String(post.id || post._id) === String(postId)) {
+              return {
+                ...post,
+                likes: isCurrentlyLiked ? post.likes : post.likes - 1,
+              };
+            }
+            return post;
+          })
+        );
+
+        if (isCurrentlyLiked) {
+          setLikedPosts_toggle((prev) => [...prev, postId]);
+        } else {
+          setLikedPosts_toggle((prev) =>
+            prev.filter((id) => String(id) !== String(postId))
+          );
+        }
+      }, 100);
+    } finally {
+      // Clear processing flag after a short delay to prevent rapid clicking
+      setTimeout(() => {
+        if (window.likeInProgress) {
+          delete window.likeInProgress[postId];
+        }
+      }, 500); // 500ms cooldown period
     }
   };
 
@@ -174,6 +251,15 @@ const Feeds = () => {
         </div>
       </div>
     );
+  }
+
+  const go_to_user = async (userId)=>{
+      try{
+        console.log(userId)
+        router.push(`/profile/${userId}`);
+      }catch(err){
+        console.log(err)
+      }
   }
 
   return (
@@ -263,10 +349,14 @@ const Feeds = () => {
                       </div>
                       <div>
                         <div className="font-semibold text-gray-900">
-                          {post.user?.name || "Unknown User"}
+                          <button onClick={()=>go_to_user(post.user_id)} className="hover:cursor-pointer">
+                            {post.user?.name || "Unknown User"}
+                          </button>
                         </div>
-                        <div className="text-sm text-gray-600">
-                          {post.user?.username || "@unknown"}
+                        <div className="text-sm text-gray-600 hover:cursor-pointer">
+                          <button onClick={()=>go_to_user(post.user_id)} className="hover:cursor-pointer">
+                            {post.user?.username || "@unknown"}
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -324,6 +414,7 @@ const Feeds = () => {
                           }`}
                         />
                         <span className="font-medium text-gray-900">
+                          {" "}
                           {(post.likes || 0).toLocaleString()}
                         </span>
                       </button>

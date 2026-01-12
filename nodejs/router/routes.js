@@ -18,6 +18,7 @@ router.use(require("./verify"))
 router.use(require("./reset"))
 router.use(require("./profile"))
 router.use(require("./all_post"))
+router.use(require("./validate_token"))
 
 
 module.exports  = router;

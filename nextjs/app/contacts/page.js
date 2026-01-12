@@ -85,7 +85,7 @@ const Contact = () => {
             <h1 className="text-4xl md:text-6xl font-bold bg-linear-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-6">
               Get in Touch
             </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-white max-w-3xl mx-auto">
               Have questions, feedback, or just want to say hello? We'd love to hear from you.
             </p>
           </div>

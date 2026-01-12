@@ -7,16 +7,39 @@ const ConditionalHeader = () => {
   const [loggedIn, setLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const checkToken = useCallback(() => {
-    const token = localStorage.getItem("token");
-    
-    if (token) {
+  const checkToken = useCallback(async () => {
+  const token = localStorage.getItem("token");
+  const BaseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+
+  if (!token) {
+    setLoggedIn(false);
+    setLoading(false);
+    return;
+  }
+
+  try {
+    const res = await fetch(`${BaseUrl}/validate_token`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token }),
+    });
+
+    const data = await res.json();
+
+    if (res.ok && data?.valid) {
       setLoggedIn(true);
     } else {
+      localStorage.removeItem("token");
       setLoggedIn(false);
     }
+  } catch (err) {
+    console.log(err);
+    setLoggedIn(false);
+  } finally {
     setLoading(false);
-  }, []);
+  }
+}, []);
+
 
   useEffect(() => {
     checkToken();

@@ -119,9 +119,10 @@ router.route("/all_post").post(async (req, res) => {
             
             return {
                 id: post._id,
-                watcher_avatar: watching_user.avatarUrl,
-                watcher_savedPosts: watching_user.savedPost || ["something missing"],
-                watcher_likedPosts: watching_user.likedPost || ["something missing"],
+                user_id: post.user_id,
+                watcher_avatar: userData?.avatarUrl || null,
+                watcher_savedPosts: watching_user?.savedPost || ["something missing"],
+                watcher_likedPosts: watching_user?.likedPost || ["something missing"],
                 user: {
                     name: displayName,
                     username: username,
